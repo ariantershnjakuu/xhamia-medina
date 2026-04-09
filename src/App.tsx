@@ -85,7 +85,7 @@ export default function App() {
         <div className="flex items-center gap-4">
           <img src="https://bislame.net/wp-content/uploads/2017/01/logore.png" alt="Xhamia Dardania" className="w-10" />
           <div>
-            <h1 className="text-[1.8vw] font-semibold tracking-tight leading-tight text-foreground uppercase">
+            <h1 className="text-2xl font-bold tracking-tight leading-tight text-foreground uppercase">
               Xhamia Dardania
             </h1>
             <p className="text-[0.8vw] font-medium text-muted-foreground/90 tracking-[0.2em] uppercase">
@@ -125,14 +125,11 @@ export default function App() {
       </div>
 
       {/* ── Prayer cards grid ─────────────────────────────── */}
-      <main className="flex-1 grid grid-cols-3 grid-rows-2 gap-4 px-8 py-5 bg-teal-200/10">
+      <main className="flex-1 grid grid-cols-3 grid-rows-2 gap-4 px-8 py-5 bg-teal-900/10">
         {PRAYER_ORDER.map((key) => {
           const time = prayers?.[key] ?? "--:--";
           const prayerMinutes = prayers ? timeToMinutes(prayers[key]) : -1;
           const isCurrent = currentPrayer?.key === key;
-          const isPast =
-            !isCurrent && prayerMinutes < currentMinutes && prayerMinutes >= 0;
-
           const iqamahTime =
             time !== "--:--" ? getIqamahTime(key, time) : "--:--";
 
@@ -152,7 +149,6 @@ export default function App() {
               iqamahTime={iqamahTime}
               isCurrent={isCurrent}
               isAdhanActive={isAdhanActive}
-              isPast={isPast}
             />
           );
         })}

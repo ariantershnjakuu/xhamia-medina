@@ -42,7 +42,7 @@ export function PrayerModal({ activePrayerKey, title, children }: Props) {
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/15 backdrop-blur-lg ${backdropClass}`}
     >
       <div
-        className={`adhan-glow-pulse relative mx-auto flex w-[72vw] max-w-5xl flex-col items-center gap-6 rounded-3xl border border-primary/30 bg-primary/40 px-16 py-12 shadow-2xl ${cardClass}`}
+        className={`adhan-glow-pulse relative mx-auto flex w-[72vw] max-w-5xl flex-col items-center gap-6 rounded-3xl border border-primary/30 bg-primary/80 px-16 py-12 shadow-2xl ${cardClass}`}
       >
         <h2
           className="text-center text-[3.5vw] font-bold leading-tight tracking-tight text-white"

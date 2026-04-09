@@ -1,14 +1,14 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+@import "@fontsource-variable/outfit";
 
 @custom-variant dark (&:is(.dark *));
 
 /* ─── shadcn theme tokens ────────────────────────────────── */
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', 'Noto Sans', system-ui, sans-serif;
+  --font-sans: 'Outfit Variable', 'Noto Sans', system-ui, sans-serif;
   --color-background:          var(--background);
   --color-foreground:          var(--foreground);
   --color-card:                var(--card);
@@ -32,25 +32,25 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* ─── Misty greige palette (lighter, not white) ─────────── */
+/* ─── Deep dark palette — teal on near-black ─────────────── */
 :root {
-  --background:          oklch(0.84 0.008 75);
-  --foreground:          oklch(0.18 0.008 65);
-  --card:                oklch(0.90 0.006 75);
-  --card-foreground:     oklch(0.18 0.008 65);
-  --popover:             oklch(0.90 0.006 75);
-  --popover-foreground:  oklch(0.18 0.008 65);
-  --primary:             oklch(0.47 0.100 186.4);
+  --background:          oklch(0.12 0.008 200);
+  --foreground:          oklch(0.95 0.005 200);
+  --card:                oklch(0.17 0.010 200);
+  --card-foreground:     oklch(0.95 0.005 200);
+  --popover:             oklch(0.17 0.010 200);
+  --popover-foreground:  oklch(0.95 0.005 200);
+  --primary:             oklch(0.58 0.130 186.4);
   --primary-foreground:  oklch(0.98 0.002 186);
-  --secondary:           oklch(0.86 0.006 75);
-  --secondary-foreground:oklch(0.28 0.007 65);
-  --muted:               oklch(0.80 0.006 75);
-  --muted-foreground:    oklch(0.34 0.007 65);
-  --accent:              oklch(0.86 0.006 75);
-  --accent-foreground:   oklch(0.18 0.008 65);
-  --border:              oklch(0.74 0.006 75);
-  --input:               oklch(0.74 0.006 75);
-  --ring:                oklch(0.47 0.100 186.4);
+  --secondary:           oklch(0.21 0.010 200);
+  --secondary-foreground:oklch(0.85 0.005 200);
+  --muted:               oklch(0.22 0.010 200);
+  --muted-foreground:    oklch(0.58 0.008 200);
+  --accent:              oklch(0.21 0.010 200);
+  --accent-foreground:   oklch(0.95 0.005 200);
+  --border:              oklch(0.27 0.010 200);
+  --input:               oklch(0.27 0.010 200);
+  --ring:                oklch(0.58 0.130 186.4);
   --radius:              0.75rem;
 }
 
@@ -70,17 +70,27 @@
   }
 }
 
+/* ─── TV safe-area / overscan compensation ───────────────── */
+/*
+ * TVs typically cut ~5% off the edges (overscan). On a 1080p screen that's
+ * ~54 px top/bottom. We bump the footer's bottom padding to ~1.5 rem (24 px)
+ * and also respect env(safe-area-inset-bottom) for browsers that expose it.
+ */
+footer {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
 /* ─── Current prayer card ring pulse ─────────────────────── */
 @keyframes next-pulse {
   0%, 100% {
     box-shadow:
-      0 0 0 1px oklch(0.47 0.100 186.4 / 0.30),
-      0 8px 32px oklch(0.47 0.100 186.4 / 0.18);
+      0 0 0 1px oklch(0.58 0.130 186.4 / 0.40),
+      0 8px 32px oklch(0.58 0.130 186.4 / 0.25);
   }
   50% {
     box-shadow:
-      0 0 0 2px oklch(0.47 0.100 186.4 / 0.50),
-      0 12px 40px oklch(0.47 0.100 186.4 / 0.28);
+      0 0 0 3px oklch(0.58 0.130 186.4 / 0.65),
+      0 12px 48px oklch(0.58 0.130 186.4 / 0.40);
   }
 }
 
@@ -91,10 +101,10 @@
 /* ─── TANI badge attention glow ──────────────────────────── */
 @keyframes tani-glow {
   0%, 100% {
-    box-shadow: 0 0 0 2px oklch(0.47 0.100 186.4 / 0.20);
+    box-shadow: 0 0 0 2px oklch(0.58 0.130 186.4 / 0.30);
   }
   50% {
-    box-shadow: 0 0 0 4px oklch(0.47 0.100 186.4 / 0.45), 0 0 16px oklch(0.47 0.100 186.4 / 0.25);
+    box-shadow: 0 0 0 5px oklch(0.58 0.130 186.4 / 0.55), 0 0 20px oklch(0.58 0.130 186.4 / 0.35);
   }
 }
 
@@ -134,8 +144,8 @@
 }
 
 @keyframes adhan-glow-pulse {
-  0%, 100% { box-shadow: 0 0 40px 8px oklch(0.47 0.100 186.4 / 0.25), 0 0 0 1px oklch(0.47 0.100 186.4 / 0.20); }
-  50%       { box-shadow: 0 0 70px 16px oklch(0.47 0.100 186.4 / 0.45), 0 0 0 2px oklch(0.47 0.100 186.4 / 0.40); }
+  0%, 100% { box-shadow: 0 0 40px 8px oklch(0.58 0.130 186.4 / 0.30), 0 0 0 1px oklch(0.58 0.130 186.4 / 0.25); }
+  50%       { box-shadow: 0 0 80px 20px oklch(0.58 0.130 186.4 / 0.55), 0 0 0 2px oklch(0.58 0.130 186.4 / 0.50); }
 }
 
 .adhan-backdrop-in  { animation: adhan-backdrop-in  0.4s ease forwards; }

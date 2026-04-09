@@ -11,10 +11,10 @@ export function CountdownBanner({ countdown }: Props) {
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-stretch divide-x divide-border/40 border-t-2 border-t-primary/20 border-b border-b-border/50 bg-card/75 backdrop-blur-sm">
       <div className="flex flex-col items-end justify-center gap-1 px-10 py-3">
-        <span className="text-muted-foreground/80 text-[0.72vw] font-semibold uppercase tracking-[0.25em]">
+        <span className="text-muted-foreground/80 text-[1.1vw] font-semibold uppercase tracking-widest">
           Namazi i radhës
         </span>
-        <span className="text-foreground text-xl font-bold leading-tight uppercase">
+        <span className="text-foreground text-2xl font-extrabold leading-tight uppercase">
           {prayerLabel}
         </span>
       </div>
@@ -32,10 +32,10 @@ export function CountdownBanner({ countdown }: Props) {
       </div>
 
       <div className="flex flex-col items-start justify-center gap-1 px-10 py-3">
-        <span className="text-muted-foreground/80 text-[0.72vw] font-semibold uppercase tracking-[0.25em]">
+        <span className="text-muted-foreground/80 text-sm font-semibold uppercase tracking-[0.25em]">
           Vendndodhja
         </span>
-        <span className="text-foreground/90 text-[1.1vw] font-semibold leading-tight">
+        <span className="text-foreground/90 text-lg font-semibold leading-tight">
           Prishtinë, Kosovë
         </span>
       </div>
@@ -45,11 +45,11 @@ export function CountdownBanner({ countdown }: Props) {
 
 function DigitBlock({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex min-w-[3.8vw] flex-col items-center">
+    <div className="flex min-w-20 flex-col items-center">
       <span className="text-primary text-[3.2vw] font-extrabold tabular-nums leading-none">
         {pad2(value)}
       </span>
-      <span className="mt-1 text-muted-foreground/70 text-[0.55vw] uppercase tracking-[0.3em]">
+      <span className="mt-1 text-muted-foreground/70 text-sm uppercase tracking-[0.3em]">
         {label}
       </span>
     </div>

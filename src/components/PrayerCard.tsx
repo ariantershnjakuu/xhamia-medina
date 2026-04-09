@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import type { PrayerKey } from "../types";
 import {
   Moon,
@@ -27,7 +27,6 @@ type Props = {
   iqamahTime: string;
   isCurrent: boolean;
   isAdhanActive: boolean;
-  isPast: boolean;
 };
 
 export function PrayerCard({
@@ -37,19 +36,16 @@ export function PrayerCard({
   iqamahTime,
   isCurrent,
   isAdhanActive,
-  isPast,
 }: Props) {
   const Icon = PRAYER_ICONS[prayerKey];
 
   return (
     <Card
       className={cn(
-        "relative flex h-full flex-col items-center justify-center gap-3 overflow-visible rounded-2xl border transition-all duration-500",
+        "relative flex h-full flex-col overflow-visible rounded-2xl border transition-all duration-500",
         isCurrent
           ? "next-prayer-ring bg-primary/35 border-primary/60 scale-[1.025] shadow-lg"
-          : isPast
-            ? "border-border/40 bg-card/70 shadow-sm opacity-55"
-            : "border-border/50 bg-card shadow-sm",
+          : "border-border/50 bg-card shadow-sm",
       )}
     >
       {isAdhanActive && (
@@ -60,77 +56,54 @@ export function PrayerCard({
         </div>
       )}
 
-      <CardContent className="flex flex-col items-center gap-3 px-4 py-0">
+      {/* Main section: icon + name + time */}
+      <CardContent className="flex flex-1 flex-col items-center justify-center gap-2 px-4 py-0">
         <Icon
           className={cn(
-            "size-[3vw]",
-            isCurrent
-              ? "text-foreground"
-              : isPast
-                ? "text-muted-foreground/55"
-                : "text-muted-foreground/80",
+            "size-[2vw]",
+            isCurrent ? "text-primary" : "text-foreground",
           )}
           strokeWidth={1.5}
         />
-
         <p
           className={cn(
-            "text-[0.9vw] font-semibold uppercase tracking-[0.18em] leading-none",
-            isCurrent
-              ? "text-foreground/80"
-              : isPast
-                ? "text-muted-foreground/70"
-                : "text-muted-foreground/90",
+            "text-[1.3vw] font-extrabold uppercase tracking-widest leading-none",
+            isCurrent ? "text-foreground" : "text-foreground/80",
           )}
         >
           {label}
         </p>
-
-        <p
-          className={cn(
-            "text-[2.8vw] font-extrabold tabular-nums leading-none",
-            isCurrent
-              ? "text-foreground"
-              : isPast
-                ? "text-foreground/55"
-                : "text-foreground",
-          )}
-        >
+        <p className="text-[4vw] font-black tabular-nums leading-none text-foreground">
           {time}
         </p>
+      </CardContent>
 
-        {prayerKey !== "lindja" && (
-          <div
+      {/* Iqamah strip — built-in border-t + bg-muted/50 from CardFooter */}
+      {prayerKey !== "lindja" && (
+        <CardFooter
+          className={cn(
+            "justify-center gap-3 py-2.5",
+            isCurrent && "bg-foreground/10",
+          )}
+        >
+          <span
             className={cn(
-              "flex items-center gap-2 rounded-full px-3 py-1",
-              isCurrent
-                ? "bg-foreground/10"
-                : "bg-muted/60",
+              "text-[1.7vw] font-bold uppercase tracking-widest leading-none",
+              isCurrent ? "text-foreground/90" : "text-foreground",
             )}
           >
-            <span
-              className={cn(
-                "text-[0.62vw] font-semibold uppercase tracking-widest",
-                isCurrent ? "text-foreground/55" : "text-muted-foreground/55",
-              )}
-            >
-              Ikameti
-            </span>
-            <span
-              className={cn(
-                "text-[0.88vw] font-bold tabular-nums",
-                isCurrent
-                  ? "text-foreground/85"
-                  : isPast
-                    ? "text-foreground/40"
-                    : "text-foreground/65",
-              )}
-            >
-              {iqamahTime}
-            </span>
-          </div>
-        )}
-      </CardContent>
+            Ikameti
+          </span>
+          <span
+            className={cn(
+              "text-[1.8vw] font-black tabular-nums leading-none",
+              isCurrent ? "text-foreground/90" : "text-foreground/85",
+            )}
+          >
+            {iqamahTime}
+          </span>
+        </CardFooter>
+      )}
     </Card>
   );
 }
