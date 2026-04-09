@@ -73,3 +73,8 @@ export function formatDayName(d: Date): string {
     weekday: "long",
   }).format(d);
 }
+
+/** Returns true if today is Friday in the Belgrade timezone (getDay() === 5). */
+export function isFridayInBelgrade(): boolean {
+  return nowInBelgrade().getDay() === 5;
+}

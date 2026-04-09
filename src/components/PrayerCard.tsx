@@ -27,6 +27,7 @@ type Props = {
   iqamahTime: string;
   isCurrent: boolean;
   isAdhanActive: boolean;
+  hideIqamah?: boolean;
 };
 
 export function PrayerCard({
@@ -36,6 +37,7 @@ export function PrayerCard({
   iqamahTime,
   isCurrent,
   isAdhanActive,
+  hideIqamah = false,
 }: Props) {
   const Icon = PRAYER_ICONS[prayerKey];
 
@@ -79,7 +81,7 @@ export function PrayerCard({
       </CardContent>
 
       {/* Iqamah strip — built-in border-t + bg-muted/50 from CardFooter */}
-      {prayerKey !== "lindja" && (
+      {prayerKey !== "lindja" && !hideIqamah && (
         <CardFooter
           className={cn(
             "justify-center gap-3 py-2.5",

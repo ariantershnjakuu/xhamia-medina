@@ -13,7 +13,7 @@ import {
   computeCountdown,
   getIqamahTime,
 } from "./utils/prayer";
-import { timeToMinutes, nowInBelgrade } from "./utils/time";
+import { timeToMinutes, nowInBelgrade, isFridayInBelgrade } from "./utils/time";
 import { ClockDisplay } from "./components/ClockDisplay";
 import { PrayerCard } from "./components/PrayerCard";
 import { CountdownBanner } from "./components/CountdownBanner";
@@ -54,6 +54,13 @@ export default function App() {
     return now.getHours() * 60 + now.getMinutes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clock.time]);
+
+  // Recompute once per clock tick so it flips at midnight automatically
+  const isFriday = useMemo(
+    () => isFridayInBelgrade(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [clock.time],
+  );
 
   const activePrayerKey = useMemo(() => {
     if (!prayers) return null;
@@ -133,6 +140,9 @@ export default function App() {
           const iqamahTime =
             time !== "--:--" ? getIqamahTime(key, time) : "--:--";
 
+          const isFridayDreka = isFriday && key === "dreka";
+          const label = isFridayDreka ? "E Xhuma" : PRAYER_LABELS[key];
+
           // "Tani" badge only shows during the Adhan → Iqamah window
           const isAdhanActive =
             isCurrent &&
@@ -144,18 +154,26 @@ export default function App() {
             <PrayerCard
               key={key}
               prayerKey={key}
-              label={PRAYER_LABELS[key]}
+              label={label}
               time={time}
               iqamahTime={iqamahTime}
               isCurrent={isCurrent}
               isAdhanActive={isAdhanActive}
+              hideIqamah={isFridayDreka}
             />
           );
         })}
       </main>
 
       {/* ── Adhan modal (adhan → iqamah window) ──────────── */}
-      <PrayerModal activePrayerKey={activePrayerKey} title={PRAYER_MODAL_TITLES[activePrayerKey ?? "sabahu"]}>
+      <PrayerModal
+        activePrayerKey={activePrayerKey}
+        title={
+          isFriday && activePrayerKey === "dreka"
+            ? "Koha e Namazit të Xhumasë"
+            : PRAYER_MODAL_TITLES[activePrayerKey ?? "sabahu"]
+        }
+      >
         <h3
           className="text-center text-2xl font-bold leading-tight tracking-tight text-white/80 uppercase"
           style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.3s ease forwards" }}
