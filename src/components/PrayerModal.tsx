@@ -45,7 +45,7 @@ export function PrayerModal({ activePrayerKey, title, children }: Props) {
         className={`adhan-glow-pulse relative mx-auto flex w-[72vw] max-w-5xl flex-col items-center gap-6 rounded-3xl border border-primary/30 bg-primary/40 px-16 py-12 shadow-2xl ${cardClass}`}
       >
         <h2
-          className="text-center text-[3.5vw] font-bold leading-tight tracking-tight text-black"
+          className="text-center text-[3.5vw] font-bold leading-tight tracking-tight text-white"
           style={{ opacity: 0, animation: "adhan-title-in 0.55s 0.15s ease forwards" }}
         >
           🕌 {title} 🕌

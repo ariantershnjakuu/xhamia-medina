@@ -161,13 +161,13 @@ export default function App() {
       {/* ── Adhan modal (adhan → iqamah window) ──────────── */}
       <PrayerModal activePrayerKey={activePrayerKey} title={PRAYER_MODAL_TITLES[activePrayerKey ?? "sabahu"]}>
         <h3
-          className="text-center text-2xl font-bold leading-tight tracking-tight text-black/80 uppercase"
+          className="text-center text-2xl font-bold leading-tight tracking-tight text-white/80 uppercase"
           style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.3s ease forwards" }}
         >
           Duaja e Ezanit
         </h3>
         <p
-          className="text-center text-[2.2vw] font-medium leading-relaxed text-foreground/90"
+          className="text-center text-[2.2vw] font-medium leading-relaxed text-white/90"
           dir="rtl"
           lang="ar"
           style={{ fontFamily: "'Noto Naskh Arabic', 'Amiri', serif", opacity: 0, animation: "adhan-text-in 0.5s 0.4s ease forwards" }}
@@ -176,13 +176,13 @@ export default function App() {
         </p>
         <div className="w-16 border-t border-primary/15" />
         <p
-          className="text-center text-[1.1vw] leading-relaxed text-foreground/70"
+          className="text-center text-[1.1vw] leading-relaxed text-white/70"
           style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.55s ease forwards" }}
         >
           {ADHAN_DUA.albanian}
         </p>
         <p
-          className="text-center text-[0.95vw] italic leading-relaxed text-foreground/45"
+          className="text-center text-[0.95vw] italic leading-relaxed text-white/45"
           style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.7s ease forwards" }}
         >
           {ADHAN_DUA.english}
@@ -192,7 +192,7 @@ export default function App() {
       {/* ── Iqamah modal (iqamah → iqamah + 5 min window) ── */}
       <PrayerModal activePrayerKey={iqamahActivePrayerKey} title="Namazi po fillon">
         <p
-          className="text-center text-[2.4vw] font-medium leading-relaxed text-foreground/90"
+          className="text-center text-[2.4vw] font-medium leading-relaxed text-white/90"
           dir="rtl"
           lang="ar"
           style={{ fontFamily: "'Noto Naskh Arabic', 'Amiri', serif", opacity: 0, animation: "adhan-text-in 0.5s 0.3s ease forwards" }}
@@ -201,13 +201,13 @@ export default function App() {
         </p>
         <div className="w-16 border-t border-primary/15" />
         <p
-          className="text-center text-[1.15vw] leading-relaxed text-foreground/75"
+          className="text-center text-[1.15vw] leading-relaxed text-white/75"
           style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.5s ease forwards" }}
         >
           {IQAMAH_AYAH.albanian}
         </p>
         <p
-          className="text-center text-[0.9vw] font-semibold tracking-widest text-black/50 uppercase"
+          className="text-center text-[0.9vw] font-semibold tracking-widest text-white/50 uppercase"
           style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.65s ease forwards" }}
         >
           — {IQAMAH_AYAH.source}
