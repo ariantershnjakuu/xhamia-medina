@@ -11,7 +11,7 @@ export function CountdownBanner({ countdown }: Props) {
   return (
     <div className="grid grid-cols-[1fr_auto_1fr] items-stretch divide-x divide-border/40 border-t-2 border-t-primary/20 border-b border-b-border/50 bg-card/75 backdrop-blur-sm">
       <div className="flex flex-col items-end justify-center gap-1 px-10 py-3">
-        <span className="text-muted-foreground/80 text-[1.1vw] font-semibold uppercase tracking-widest">
+        <span className="text-muted-foreground/80 text-[1.1wvw] font-semibold uppercase tracking-widest">
           Namazi i radhës
         </span>
         <span className="text-foreground text-2xl font-extrabold leading-tight uppercase">

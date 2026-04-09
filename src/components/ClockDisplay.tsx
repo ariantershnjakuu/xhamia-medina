@@ -19,7 +19,7 @@ export function ClockDisplay({ clock }: Props) {
         </span>
       </div>
 
-      <p className="text-foreground/70 text-[0.95vw] font-medium tracking-widest uppercase">
+      <p className="text-foreground/70 text-[1.15vw] font-medium tracking-widest uppercase">
         {clock.date}
       </p>
     </div>

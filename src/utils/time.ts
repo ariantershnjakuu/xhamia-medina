@@ -21,14 +21,35 @@ export function formatClock(d: Date): string {
   return `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
 }
 
+const ALBANIAN_DAYS = [
+  "e Diel",
+  "e Hënë",
+  "e Martë",
+  "e Mërkurë",
+  "e Enjte",
+  "e Premte",
+  "e Shtunë",
+] as const;
+
+const ALBANIAN_MONTHS = [
+  "Janar",
+  "Shkurt",
+  "Mars",
+  "Prill",
+  "Maj",
+  "Qershor",
+  "Korrik",
+  "Gusht",
+  "Shtator",
+  "Tetor",
+  "Nëntor",
+  "Dhjetor",
+] as const;
+
 export function formatDate(d: Date): string {
-  return new Intl.DateTimeFormat("sq-AL", {
-    timeZone: TZ,
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(d);
+  const dayName = ALBANIAN_DAYS[d.getDay()];
+  const month = ALBANIAN_MONTHS[d.getMonth()];
+  return `${dayName}, ${d.getDate()} ${month} ${d.getFullYear()}`;
 }
 
 /** Returns the current UTC offset for the Belgrade timezone (2 in summer, 1 in winter). */
