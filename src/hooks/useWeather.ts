@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { WeatherData } from "../types";
 
 // Prishtina coordinates
 const LAT = 42.6629;
 const LON = 21.1655;
-const REFRESH_MS = 30 * 60 * 1000; // 30 minutes
+const REFRESH_MS = 20 * 60 * 1000; // 20 minutes
 
 // WMO weather interpretation codes → Albanian label
 const WEATHER_LABELS: Record<number, string> = {
@@ -67,7 +67,7 @@ type State = {
 export function useWeather(): State {
   const [state, setState] = useState<State>({ data: null, loading: true });
 
-  const fetchWeather = async () => {
+  const fetchWeather = useCallback(async () => {
     try {
       const url = new URL("https://api.open-meteo.com/v1/forecast");
       url.searchParams.set("latitude", String(LAT));
@@ -96,15 +96,33 @@ export function useWeather(): State {
       });
     } catch (err) {
       console.warn("[useWeather] failed:", err);
-      setState({ data: null, loading: false });
+      // Keep the last known data rather than blanking the display
+      setState((prev) => ({ ...prev, loading: false }));
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchWeather();
-    const id = setInterval(fetchWeather, REFRESH_MS);
-    return () => clearInterval(id);
-  }, []);
+    const pollId = setInterval(fetchWeather, REFRESH_MS);
+
+    // Re-fetch immediately when the TV screen wakes or network is restored
+    const onVisible = () => {
+      if (document.visibilityState === "visible") fetchWeather();
+    };
+    const onOnline = () => {
+      console.info("[useWeather] network restored — re-fetching");
+      fetchWeather();
+    };
+
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("online", onOnline);
+
+    return () => {
+      clearInterval(pollId);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("online", onOnline);
+    };
+  }, [fetchWeather]);
 
   return state;
 }

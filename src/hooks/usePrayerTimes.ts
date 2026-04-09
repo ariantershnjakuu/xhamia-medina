@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import type { PrayerData, ApiResponse } from "../types";
-import { MOCK_PRAYER_TIMES } from "../utils/prayer";
+import { MOCK_PRAYER_TIMES, applyMosqueRules } from "../utils/prayer";
 
 type State = {
   data: PrayerData | null;
@@ -16,7 +16,7 @@ function makeFallback(): PrayerData {
   return {
     date: new Date().toLocaleDateString("sq"),
     source: "mock fallback",
-    prayers: MOCK_PRAYER_TIMES,
+    prayers: applyMosqueRules(MOCK_PRAYER_TIMES),
     updatedAt: new Date().toISOString(),
   };
 }
@@ -41,7 +41,10 @@ export function usePrayerTimes(): State {
       }
 
       setState({
-        data: json.data,
+        data: {
+          ...json.data,
+          prayers: applyMosqueRules(json.data.prayers),
+        },
         loading: false,
         error: null,
         isStale: json.error === "stale_cache",

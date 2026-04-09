@@ -1,5 +1,42 @@
 import type { PrayerKey, PrayerTimes, Countdown } from "../types";
-import { timeToMinutes, nowInBelgrade, pad2 } from "./time";
+import { timeToMinutes, nowInBelgrade, pad2, getBelgradeUTCOffsetHours } from "./time";
+
+const IQAMAH_OFFSET_MINUTES: Record<PrayerKey, number> = {
+  sabahu: 5,
+  lindja: 10,
+  dreka: 15,
+  ikindia: 10,
+  akshami: 5,
+  jacia: 10,
+};
+
+/**
+ * Sabahu Adhan at this mosque is always 35 minutes before Lindja e Diellit.
+ * Apply this rule once after fetching so all downstream consumers are consistent.
+ */
+export function applyMosqueRules(prayers: PrayerTimes): PrayerTimes {
+  const [lh, lm] = prayers.lindja.split(":").map(Number);
+  const sabahuMinutes = lh * 60 + lm - 35;
+  const sabahuH = Math.floor(sabahuMinutes / 60) % 24;
+  const sabahuM = sabahuMinutes % 60;
+
+  // Dreka is fixed: 13:00 in summer (UTC+2) and 12:00 in winter (UTC+1)
+  const dreka = getBelgradeUTCOffsetHours() === 2 ? "13:00" : "12:00";
+
+  return {
+    ...prayers,
+    sabahu: `${pad2(sabahuH)}:${pad2(sabahuM)}`,
+    dreka,
+  };
+}
+
+export function getIqamahTime(prayerKey: PrayerKey, adhanTime: string): string {
+  const [h, m] = adhanTime.split(":").map(Number);
+  const totalMinutes = h * 60 + m + IQAMAH_OFFSET_MINUTES[prayerKey];
+  const iqamahH = Math.floor(totalMinutes / 60) % 24;
+  const iqamahM = totalMinutes % 60;
+  return `${pad2(iqamahH)}:${pad2(iqamahM)}`;
+}
 
 export const PRAYER_LABELS: Record<PrayerKey, string> = {
   sabahu: "Sabahu",
@@ -18,6 +55,22 @@ export const PRAYER_ORDER: PrayerKey[] = [
   "akshami",
   "jacia",
 ];
+
+export function getCurrentPrayer(
+  prayers: PrayerTimes
+): { key: PrayerKey; label: string } | null {
+  const now = nowInBelgrade();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  let lastPassed: PrayerKey | null = null;
+  for (const key of PRAYER_ORDER) {
+    if (timeToMinutes(prayers[key]) <= currentMinutes) {
+      lastPassed = key;
+    }
+  }
+
+  return lastPassed ? { key: lastPassed, label: PRAYER_LABELS[lastPassed] } : null;
+}
 
 export function getNextPrayer(
   prayers: PrayerTimes

@@ -40,8 +40,8 @@
   --card-foreground:     oklch(0.18 0.008 65);
   --popover:             oklch(0.90 0.006 75);
   --popover-foreground:  oklch(0.18 0.008 65);
-  --primary:             oklch(0.46 0.05 160);
-  --primary-foreground:  oklch(0.96 0.002 80);
+  --primary:             oklch(0.47 0.100 186.4);
+  --primary-foreground:  oklch(0.98 0.002 186);
   --secondary:           oklch(0.86 0.006 75);
   --secondary-foreground:oklch(0.28 0.007 65);
   --muted:               oklch(0.80 0.006 75);
@@ -50,7 +50,7 @@
   --accent-foreground:   oklch(0.18 0.008 65);
   --border:              oklch(0.74 0.006 75);
   --input:               oklch(0.74 0.006 75);
-  --ring:                oklch(0.46 0.05 160);
+  --ring:                oklch(0.47 0.100 186.4);
   --radius:              0.75rem;
 }
 
@@ -70,20 +70,34 @@
   }
 }
 
-/* ─── Next-prayer card subtle pulse ──────────────────────── */
+/* ─── Current prayer card ring pulse ─────────────────────── */
 @keyframes next-pulse {
   0%, 100% {
     box-shadow:
-      0 0 0 1px oklch(0.46 0.05 160 / 0.22),
-      0 6px 24px oklch(0.46 0.05 160 / 0.10);
+      0 0 0 1px oklch(0.47 0.100 186.4 / 0.30),
+      0 8px 32px oklch(0.47 0.100 186.4 / 0.18);
   }
   50% {
     box-shadow:
-      0 0 0 2px oklch(0.46 0.05 160 / 0.32),
-      0 8px 28px oklch(0.46 0.05 160 / 0.14);
+      0 0 0 2px oklch(0.47 0.100 186.4 / 0.50),
+      0 12px 40px oklch(0.47 0.100 186.4 / 0.28);
   }
 }
 
 .next-prayer-ring {
-  animation: next-pulse 3s ease-in-out infinite;
+  animation: next-pulse 2.5s ease-in-out infinite;
+}
+
+/* ─── TANI badge attention glow ──────────────────────────── */
+@keyframes tani-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 2px oklch(0.47 0.100 186.4 / 0.20);
+  }
+  50% {
+    box-shadow: 0 0 0 4px oklch(0.47 0.100 186.4 / 0.45), 0 0 16px oklch(0.47 0.100 186.4 / 0.25);
+  }
+}
+
+.tani-badge {
+  animation: tani-glow 1.8s ease-in-out infinite;
 }

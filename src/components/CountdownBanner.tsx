@@ -1,4 +1,3 @@
-import { Separator } from "@/components/ui/separator";
 import type { Countdown } from "../types";
 import { pad2 } from "../utils/time";
 
@@ -10,19 +9,17 @@ export function CountdownBanner({ countdown }: Props) {
   const { prayerLabel, hours, minutes, seconds } = countdown;
 
   return (
-    <div className="flex items-center justify-center gap-8 border-b border-border/50 bg-card/75 px-10 py-3 backdrop-blur-sm">
-      <div className="flex flex-col items-end gap-0.5">
-        <span className="text-muted-foreground/90 text-[0.78vw] font-semibold uppercase tracking-[0.2em]">
+    <div className="grid grid-cols-[1fr_auto_1fr] items-stretch divide-x divide-border/40 border-t-2 border-t-primary/20 border-b border-b-border/50 bg-card/75 backdrop-blur-sm">
+      <div className="flex flex-col items-end justify-center gap-1 px-10 py-3">
+        <span className="text-muted-foreground/80 text-[0.72vw] font-semibold uppercase tracking-[0.25em]">
           Namazi i radhës
         </span>
-        <span className="text-foreground text-[1.4vw] font-bold leading-tight">
+        <span className="text-foreground text-xl font-bold leading-tight uppercase">
           {prayerLabel}
         </span>
       </div>
 
-      <Separator orientation="vertical" className="h-9" />
-
-      <div className="flex items-center">
+      <div className="flex items-center justify-center gap-0 px-10 py-3">
         {hours > 0 && (
           <>
             <DigitBlock value={hours} label="orë" />
@@ -34,13 +31,11 @@ export function CountdownBanner({ countdown }: Props) {
         <DigitBlock value={seconds} label="sekonda" />
       </div>
 
-      <Separator orientation="vertical" className="h-9" />
-
-      <div className="flex flex-col items-start gap-0.5">
-        <span className="text-muted-foreground/90 text-[0.78vw] font-semibold uppercase tracking-[0.2em]">
+      <div className="flex flex-col items-start justify-center gap-1 px-10 py-3">
+        <span className="text-muted-foreground/80 text-[0.72vw] font-semibold uppercase tracking-[0.25em]">
           Vendndodhja
         </span>
-        <span className="text-foreground/90 text-[1.05vw] font-semibold leading-tight">
+        <span className="text-foreground/90 text-[1.1vw] font-semibold leading-tight">
           Prishtinë, Kosovë
         </span>
       </div>
@@ -50,11 +45,11 @@ export function CountdownBanner({ countdown }: Props) {
 
 function DigitBlock({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex min-w-[3.5vw] flex-col items-center">
-      <span className="text-primary text-[2.8vw] font-extrabold tabular-nums leading-none">
+    <div className="flex min-w-[3.8vw] flex-col items-center">
+      <span className="text-primary text-[3.2vw] font-extrabold tabular-nums leading-none">
         {pad2(value)}
       </span>
-      <span className="mt-0.5 text-muted-foreground/80 text-[0.58vw] uppercase tracking-widest">
+      <span className="mt-1 text-muted-foreground/70 text-[0.55vw] uppercase tracking-[0.3em]">
         {label}
       </span>
     </div>
@@ -63,7 +58,7 @@ function DigitBlock({ value, label }: { value: number; label: string }) {
 
 function ColonSep() {
   return (
-    <span className="mx-1 -mt-2 text-primary/55 text-[2.4vw] font-medium leading-none">
+    <span className="mx-1.5 -mt-2 text-primary/50 text-[2.8vw] font-light leading-none">
       :
     </span>
   );

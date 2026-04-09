@@ -1,5 +1,6 @@
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Wind } from "lucide-react";
 import type { WeatherData } from "../types";
 import { WEATHER_ICONS, getWeatherLabel } from "../hooks/useWeather";
 
@@ -34,24 +35,25 @@ export function WeatherWidget({ weather, loading }: Props) {
 
   return (
     <div className="flex items-center gap-4">
-      <span className="text-[2.4vw] leading-none">{icon}</span>
+      <span className="text-[2.2vw] leading-none">{icon}</span>
 
       <div className="flex flex-col">
-        <span className="text-foreground text-[2vw] font-extrabold tabular-nums leading-none">
+        <span className="text-foreground text-[1.9vw] font-extrabold tabular-nums leading-none">
           {weather.temperature}°C
         </span>
-        <span className="text-muted-foreground/90 text-[0.85vw] font-medium leading-tight">
+        <span className="text-muted-foreground/80 text-[0.78vw] font-medium leading-tight tracking-wide">
           {label}
         </span>
       </div>
 
-      <Separator orientation="vertical" className="h-8 mx-1" />
+      <Separator orientation="vertical" className="h-7 mx-1" />
 
-      <div className="flex flex-col">
-        <span className="text-foreground/85 text-[1vw] font-semibold">
-          💨 {weather.windSpeed} km/h
+      <div className="flex flex-col gap-0.5">
+        <span className="flex items-center gap-1 text-foreground/80 text-[0.9vw] font-semibold tabular-nums">
+          <Wind className="size-[0.85vw] text-muted-foreground/70" strokeWidth={2} />
+          {weather.windSpeed} km/h
         </span>
-        <span className="text-muted-foreground/80 text-[0.75vw]">erë</span>
+        <span className="text-muted-foreground/70 text-[0.7vw] uppercase tracking-[0.2em]">erë</span>
       </div>
     </div>
   );
