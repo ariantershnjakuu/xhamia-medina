@@ -1,43 +1,27 @@
-import type { Config, Handler, HandlerEvent } from "@netlify/functions";
+import type { Config } from "@netlify/functions";
 import {
   clearPrayerCache,
   getCachedPrayerData,
   getPrayerData,
 } from "../../server/src/lib/prayer-cache.ts";
 
-function json(statusCode: number, body: unknown) {
-  return {
-    statusCode,
+function json(status: number, body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status,
     headers: {
       "content-type": "application/json; charset=utf-8",
       "cache-control": "no-store",
     },
-    body: JSON.stringify(body),
-  };
+  });
 }
 
-function getRequestPath(event: HandlerEvent): string {
-  if (event.path) {
-    return event.path.replace(/\/+$/, "") || "/";
-  }
+export default async function handler(req: Request): Promise<Response> {
+  const url = new URL(req.url);
+  const isRefresh = url.pathname.endsWith("/refresh");
 
-  if (event.rawUrl) {
-    return new URL(event.rawUrl).pathname.replace(/\/+$/, "") || "/";
-  }
-
-  return "/";
-}
-
-export const handler: Handler = async (event) => {
-  const path = getRequestPath(event);
-
-  if (path.endsWith("/refresh")) {
-    if (event.httpMethod !== "POST") {
-      return json(405, {
-        success: false,
-        data: null,
-        error: "Method not allowed",
-      });
+  if (isRefresh) {
+    if (req.method !== "POST") {
+      return json(405, { success: false, data: null, error: "Method not allowed" });
     }
 
     try {
@@ -45,20 +29,12 @@ export const handler: Handler = async (event) => {
       const data = await getPrayerData();
       return json(200, { success: true, data, error: null });
     } catch (error) {
-      return json(503, {
-        success: false,
-        data: null,
-        error: String(error),
-      });
+      return json(503, { success: false, data: null, error: String(error) });
     }
   }
 
-  if (event.httpMethod !== "GET") {
-    return json(405, {
-      success: false,
-      data: null,
-      error: "Method not allowed",
-    });
+  if (req.method !== "GET") {
+    return json(405, { success: false, data: null, error: "Method not allowed" });
   }
 
   try {
@@ -69,20 +45,12 @@ export const handler: Handler = async (event) => {
 
     const cachedData = getCachedPrayerData();
     if (cachedData) {
-      return json(200, {
-        success: true,
-        data: cachedData,
-        error: "stale_cache",
-      });
+      return json(200, { success: true, data: cachedData, error: "stale_cache" });
     }
 
-    return json(503, {
-      success: false,
-      data: null,
-      error: "Could not fetch prayer times",
-    });
+    return json(503, { success: false, data: null, error: "Could not fetch prayer times" });
   }
-};
+}
 
 export const config: Config = {
   path: ["/api/prayers", "/api/prayers/refresh"],
