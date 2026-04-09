@@ -47,6 +47,23 @@ export const PRAYER_LABELS: Record<PrayerKey, string> = {
   jacia: "Jacia",
 };
 
+export const PRAYER_MODAL_TITLES: Record<PrayerKey, string> = {
+  sabahu: "Koha e Namazit të Sabahut",
+  lindja: "",
+  dreka: "Koha e Namazit të Drekës",
+  ikindia: "Koha e Namazit të Ikindisë",
+  akshami: "Koha e Namazit të Akshamit",
+  jacia: "Koha e Namazit të Jacisë",
+};
+
+export const ADHAN_PRAYER_KEYS = new Set<PrayerKey>([
+  "sabahu",
+  "dreka",
+  "ikindia",
+  "akshami",
+  "jacia",
+]);
+
 export const PRAYER_ORDER: PrayerKey[] = [
   "sabahu",
   "lindja",

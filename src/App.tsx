@@ -6,6 +6,8 @@ import { useAutoReload } from "./hooks/useAutoReload";
 import {
   PRAYER_ORDER,
   PRAYER_LABELS,
+  PRAYER_MODAL_TITLES,
+  ADHAN_PRAYER_KEYS,
   getNextPrayer,
   getCurrentPrayer,
   computeCountdown,
@@ -16,6 +18,8 @@ import { ClockDisplay } from "./components/ClockDisplay";
 import { PrayerCard } from "./components/PrayerCard";
 import { CountdownBanner } from "./components/CountdownBanner";
 import { WeatherWidget } from "./components/WeatherWidget";
+import { PrayerModal } from "./components/PrayerModal";
+import { ADHAN_DUA, IQAMAH_AYAH } from "./utils/dua";
 
 export default function App() {
   useAutoReload();
@@ -50,6 +54,29 @@ export default function App() {
     return now.getHours() * 60 + now.getMinutes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clock.time]);
+
+  const activePrayerKey = useMemo(() => {
+    if (!prayers) return null;
+    for (const key of PRAYER_ORDER) {
+      if (!ADHAN_PRAYER_KEYS.has(key)) continue;
+      const prayerMinutes = timeToMinutes(prayers[key]);
+      const iqamahMinutes = timeToMinutes(getIqamahTime(key, prayers[key]));
+      if (currentMinutes >= prayerMinutes && currentMinutes < iqamahMinutes) return key;
+    }
+    return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prayers, currentMinutes]);
+
+  const iqamahActivePrayerKey = useMemo(() => {
+    if (!prayers) return null;
+    for (const key of PRAYER_ORDER) {
+      if (!ADHAN_PRAYER_KEYS.has(key)) continue;
+      const iqamahMinutes = timeToMinutes(getIqamahTime(key, prayers[key]));
+      if (currentMinutes >= iqamahMinutes && currentMinutes < iqamahMinutes + 5) return key;
+    }
+    return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prayers, currentMinutes]);
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-background">
@@ -130,6 +157,62 @@ export default function App() {
           );
         })}
       </main>
+
+      {/* ── Adhan modal (adhan → iqamah window) ──────────── */}
+      <PrayerModal activePrayerKey={activePrayerKey} title={PRAYER_MODAL_TITLES[activePrayerKey ?? "sabahu"]}>
+        <h3
+          className="text-center text-2xl font-bold leading-tight tracking-tight text-black/80 uppercase"
+          style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.3s ease forwards" }}
+        >
+          Duaja e Ezanit
+        </h3>
+        <p
+          className="text-center text-[2.2vw] font-medium leading-relaxed text-foreground/90"
+          dir="rtl"
+          lang="ar"
+          style={{ fontFamily: "'Noto Naskh Arabic', 'Amiri', serif", opacity: 0, animation: "adhan-text-in 0.5s 0.4s ease forwards" }}
+        >
+          {ADHAN_DUA.arabic}
+        </p>
+        <div className="w-16 border-t border-primary/15" />
+        <p
+          className="text-center text-[1.1vw] leading-relaxed text-foreground/70"
+          style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.55s ease forwards" }}
+        >
+          {ADHAN_DUA.albanian}
+        </p>
+        <p
+          className="text-center text-[0.95vw] italic leading-relaxed text-foreground/45"
+          style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.7s ease forwards" }}
+        >
+          {ADHAN_DUA.english}
+        </p>
+      </PrayerModal>
+
+      {/* ── Iqamah modal (iqamah → iqamah + 5 min window) ── */}
+      <PrayerModal activePrayerKey={iqamahActivePrayerKey} title="Namazi po fillon">
+        <p
+          className="text-center text-[2.4vw] font-medium leading-relaxed text-foreground/90"
+          dir="rtl"
+          lang="ar"
+          style={{ fontFamily: "'Noto Naskh Arabic', 'Amiri', serif", opacity: 0, animation: "adhan-text-in 0.5s 0.3s ease forwards" }}
+        >
+          {IQAMAH_AYAH.arabic}
+        </p>
+        <div className="w-16 border-t border-primary/15" />
+        <p
+          className="text-center text-[1.15vw] leading-relaxed text-foreground/75"
+          style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.5s ease forwards" }}
+        >
+          {IQAMAH_AYAH.albanian}
+        </p>
+        <p
+          className="text-center text-[0.9vw] font-semibold tracking-widest text-black/50 uppercase"
+          style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.65s ease forwards" }}
+        >
+          — {IQAMAH_AYAH.source}
+        </p>
+      </PrayerModal>
 
       {/* ── Footer ────────────────────────────────────────── */}
       <footer className="flex shrink-0 items-center justify-between border-t border-border/60 bg-card/80 px-10 py-3 backdrop-blur-sm">
