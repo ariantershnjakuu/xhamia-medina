@@ -1,4 +1,4 @@
-import type { Config, Handler } from "@netlify/functions";
+import type { Config, Handler, HandlerEvent } from "@netlify/functions";
 import {
   clearPrayerCache,
   getCachedPrayerData,
@@ -16,8 +16,20 @@ function json(statusCode: number, body: unknown) {
   };
 }
 
-const handler: Handler = async (event) => {
-  const path = event.path.replace(/\/+$/, "") || "/";
+function getRequestPath(event: HandlerEvent): string {
+  if (event.path) {
+    return event.path.replace(/\/+$/, "") || "/";
+  }
+
+  if (event.rawUrl) {
+    return new URL(event.rawUrl).pathname.replace(/\/+$/, "") || "/";
+  }
+
+  return "/";
+}
+
+export const handler: Handler = async (event) => {
+  const path = getRequestPath(event);
 
   if (path.endsWith("/refresh")) {
     if (event.httpMethod !== "POST") {
@@ -75,5 +87,3 @@ const handler: Handler = async (event) => {
 export const config: Config = {
   path: ["/api/prayers", "/api/prayers/refresh"],
 };
-
-export { handler as default };
