@@ -54,7 +54,7 @@ export default function App() {
             <h1 className="text-[1.8vw] font-semibold tracking-tight leading-tight text-foreground">
               Xhamia Dardania
             </h1>
-            <p className="text-[0.8vw] text-muted-foreground tracking-[0.2em] uppercase">
+            <p className="text-[0.8vw] font-medium text-muted-foreground/90 tracking-[0.2em] uppercase">
               Prishtinë · Kosovë
             </p>
           </div>
@@ -67,7 +67,7 @@ export default function App() {
         <Separator orientation="vertical" className="h-10" />
 
         <div className="flex flex-col items-end gap-1 min-w-[9vw]">
-          <span className="text-muted-foreground/60 text-[0.72vw] uppercase tracking-widest">
+          <span className="text-muted-foreground/85 text-[0.72vw] font-medium uppercase tracking-widest">
             Bashkësia Islame e Kosovës
           </span>
           <span className="text-primary text-[0.8vw] font-medium">
@@ -86,7 +86,7 @@ export default function App() {
         {countdown ? (
           <CountdownBanner countdown={countdown} />
         ) : (
-          <div className="py-4 text-center text-[1vw] text-muted-foreground/50">
+          <div className="py-4 text-center text-[1vw] font-medium text-muted-foreground/80">
             Duke ngarkuar kohët e namazit…
           </div>
         )}
@@ -119,19 +119,19 @@ export default function App() {
         <WeatherWidget weather={weather} loading={weatherLoading} />
 
         <div className="flex flex-col items-center">
-          <p className="text-muted-foreground/50 text-[0.75vw] uppercase tracking-[0.2em]">
+          <p className="text-muted-foreground/80 text-[0.75vw] font-medium uppercase tracking-[0.2em]">
             Zona kohore
           </p>
-          <p className="text-foreground/80 text-[0.9vw] font-medium">
+          <p className="text-foreground/90 text-[0.9vw] font-semibold">
             Europe / Belgrade
           </p>
         </div>
 
         <div className="text-right">
-          <p className="text-muted-foreground/50 text-[0.75vw] uppercase tracking-widest">
+          <p className="text-muted-foreground/80 text-[0.75vw] font-medium uppercase tracking-widest">
             Data e sotme
           </p>
-          <p className="text-foreground/80 text-[0.9vw] font-medium">
+          <p className="text-foreground/90 text-[0.9vw] font-semibold">
             {prayerData?.date ?? "—"}
           </p>
         </div>

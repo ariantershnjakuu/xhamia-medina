@@ -86,6 +86,16 @@ pnpm build:server
 
 Then run the server and serve `dist/` via nginx or any static file server.
 
+### Netlify deployment
+
+The frontend can stay on `/api/prayers` in production.
+
+- Netlify serves the Vite app from `dist/`
+- `netlify/functions/api.ts` handles `/api/prayers` and `/api/prayers/refresh`
+- `netlify.toml` points Netlify at the correct publish and functions directories
+
+This means Netlify no longer depends on the local Vite proxy used in development.
+
 ---
 
 ## API

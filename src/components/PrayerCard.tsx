@@ -35,16 +35,19 @@ export function PrayerCard({ prayerKey, label, time, isNext, isPast }: Props) {
   return (
     <Card
       className={cn(
-        "relative flex h-full flex-col items-center justify-center gap-3 rounded-2xl border transition-all duration-500",
+        "relative flex h-full flex-col items-center justify-center gap-3 overflow-visible rounded-2xl border transition-all duration-500",
         isNext &&
-          "next-prayer-ring bg-primary/8 border-primary/30 scale-[1.02]",
-        isPast && "opacity-40",
+          "next-prayer-ring bg-primary/10 border-primary/35 scale-[1.02]",
+        isPast && "opacity-60",
         !isNext && !isPast && "border-border/50 bg-card",
       )}
     >
       {isNext && (
         <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-          <Badge className="px-3 py-0.5 text-[0.65vw] uppercase tracking-widest rounded-full font-semibold shadow-sm">
+          <Badge
+            variant="outline"
+            className="border-border/80 bg-card px-3 py-0.5 text-[0.65vw] font-semibold uppercase tracking-widest text-foreground shadow-md"
+          >
             Namazi i radhës
           </Badge>
         </div>
@@ -57,20 +60,20 @@ export function PrayerCard({ prayerKey, label, time, isNext, isPast }: Props) {
             isNext
               ? "text-primary"
               : isPast
-                ? "text-muted-foreground/40"
-                : "text-muted-foreground/60",
+                ? "text-muted-foreground/70"
+                : "text-muted-foreground/85",
           )}
           strokeWidth={1.5}
         />
 
         <p
           className={cn(
-            "text-[0.95vw] font-medium uppercase tracking-[0.15em] leading-none",
+            "text-[0.95vw] font-semibold uppercase tracking-[0.15em] leading-none",
             isNext
               ? "text-primary"
               : isPast
-                ? "text-muted-foreground/40"
-                : "text-muted-foreground",
+                ? "text-muted-foreground/80"
+                : "text-muted-foreground/95",
           )}
         >
           {label}
@@ -78,11 +81,11 @@ export function PrayerCard({ prayerKey, label, time, isNext, isPast }: Props) {
 
         <p
           className={cn(
-            "text-[2.8vw] font-bold tabular-nums leading-none",
+            "text-[2.8vw] font-extrabold tabular-nums leading-none",
             isNext
               ? "text-primary"
               : isPast
-                ? "text-foreground/25"
+                ? "text-foreground/65"
                 : "text-foreground",
           )}
         >

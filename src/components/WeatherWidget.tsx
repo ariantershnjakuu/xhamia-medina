@@ -23,7 +23,7 @@ export function WeatherWidget({ weather, loading }: Props) {
 
   if (!weather) {
     return (
-      <p className="text-muted-foreground/50 text-[0.9vw]">
+      <p className="text-muted-foreground/80 text-[0.9vw]">
         Moti i padisponueshëm
       </p>
     );
@@ -37,10 +37,10 @@ export function WeatherWidget({ weather, loading }: Props) {
       <span className="text-[2.4vw] leading-none">{icon}</span>
 
       <div className="flex flex-col">
-        <span className="text-foreground text-[2vw] font-bold tabular-nums leading-none">
+        <span className="text-foreground text-[2vw] font-extrabold tabular-nums leading-none">
           {weather.temperature}°C
         </span>
-        <span className="text-muted-foreground text-[0.85vw] leading-tight">
+        <span className="text-muted-foreground/90 text-[0.85vw] font-medium leading-tight">
           {label}
         </span>
       </div>
@@ -48,10 +48,10 @@ export function WeatherWidget({ weather, loading }: Props) {
       <Separator orientation="vertical" className="h-8 mx-1" />
 
       <div className="flex flex-col">
-        <span className="text-foreground/70 text-[1vw] font-medium">
+        <span className="text-foreground/85 text-[1vw] font-semibold">
           💨 {weather.windSpeed} km/h
         </span>
-        <span className="text-muted-foreground/50 text-[0.75vw]">erë</span>
+        <span className="text-muted-foreground/80 text-[0.75vw]">erë</span>
       </div>
     </div>
   );
