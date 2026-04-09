@@ -1,3 +1,4 @@
+import { Separator } from "@/components/ui/separator";
 import type { Countdown } from "../types";
 import { pad2 } from "../utils/time";
 
@@ -9,58 +10,37 @@ export function CountdownBanner({ countdown }: Props) {
   const { prayerLabel, hours, minutes, seconds } = countdown;
 
   return (
-    <div
-      className="flex items-center justify-center gap-8 py-3 px-10"
-      style={{
-        background: "rgba(52,211,153,0.06)",
-        borderTop: "1px solid rgba(52,211,153,0.18)",
-        borderBottom: "1px solid rgba(52,211,153,0.18)",
-      }}
-    >
-      {/* Left label */}
-      <div className="flex flex-col items-end">
-        <span
-          className="text-[0.85vw] font-medium uppercase tracking-[0.25em]"
-          style={{ color: "#34d399" }}
-        >
+    <div className="flex items-center justify-center gap-8 border-b border-border/40 bg-card/60 px-10 py-3 backdrop-blur-sm">
+      <div className="flex flex-col items-end gap-0.5">
+        <span className="text-muted-foreground text-[0.78vw] font-medium uppercase tracking-[0.2em]">
           Namazi i radhës
         </span>
-        <span className="text-[1.5vw] font-bold text-white tracking-wide">
+        <span className="text-foreground text-[1.4vw] font-bold leading-tight">
           {prayerLabel}
         </span>
       </div>
 
-      {/* Vertical divider */}
-      <div className="divider-v" />
+      <Separator orientation="vertical" className="h-9" />
 
-      {/* Countdown digits */}
-      <div className="flex items-center gap-0.5">
+      <div className="flex items-center">
         {hours > 0 && (
           <>
-            <DigitGroup value={hours} label="orë" />
-            <Sep />
+            <DigitBlock value={hours} label="orë" />
+            <ColonSep />
           </>
         )}
-        <DigitGroup value={minutes} label="minuta" />
-        <Sep />
-        <DigitGroup value={seconds} label="sekonda" />
+        <DigitBlock value={minutes} label="minuta" />
+        <ColonSep />
+        <DigitBlock value={seconds} label="sekonda" />
       </div>
 
-      {/* Vertical divider */}
-      <div className="divider-v" />
+      <Separator orientation="vertical" className="h-9" />
 
-      {/* Right info */}
-      <div className="flex flex-col items-start">
-        <span
-          className="text-[0.85vw] font-medium uppercase tracking-[0.25em]"
-          style={{ color: "rgba(186,230,253,0.5)" }}
-        >
-          Koha vendore
+      <div className="flex flex-col items-start gap-0.5">
+        <span className="text-muted-foreground text-[0.78vw] font-medium uppercase tracking-[0.2em]">
+          Vendndodhja
         </span>
-        <span
-          className="text-[1.1vw] font-semibold"
-          style={{ color: "rgba(186,230,253,0.75)" }}
-        >
+        <span className="text-foreground/80 text-[1.05vw] font-semibold leading-tight">
           Prishtinë, Kosovë
         </span>
       </div>
@@ -68,31 +48,22 @@ export function CountdownBanner({ countdown }: Props) {
   );
 }
 
-function DigitGroup({ value, label }: { value: number; label: string }) {
+function DigitBlock({ value, label }: { value: number; label: string }) {
   return (
-    <div className="flex flex-col items-center min-w-[3.8vw]">
-      <span
-        className="text-[3.2vw] font-bold tabular-nums leading-none"
-        style={{ color: "#34d399" }}
-      >
+    <div className="flex min-w-[3.5vw] flex-col items-center">
+      <span className="text-primary text-[2.8vw] font-bold tabular-nums leading-none">
         {pad2(value)}
       </span>
-      <span
-        className="text-[0.65vw] uppercase tracking-widest mt-0.5"
-        style={{ color: "rgba(255,255,255,0.35)" }}
-      >
+      <span className="text-muted-foreground/50 text-[0.58vw] uppercase tracking-widest mt-0.5">
         {label}
       </span>
     </div>
   );
 }
 
-function Sep() {
+function ColonSep() {
   return (
-    <span
-      className="text-[2.8vw] font-bold leading-none mx-0.5 -mt-2"
-      style={{ color: "rgba(52,211,153,0.45)" }}
-    >
+    <span className="text-primary/30 text-[2.4vw] font-light leading-none mx-1 -mt-2">
       :
     </span>
   );

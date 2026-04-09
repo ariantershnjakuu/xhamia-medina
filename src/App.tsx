@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Separator } from "@/components/ui/separator";
 import { useClock } from "./hooks/useClock";
 import { usePrayerTimes } from "./hooks/usePrayerTimes";
 import { useWeather } from "./hooks/useWeather";
@@ -14,10 +15,9 @@ import { ClockDisplay } from "./components/ClockDisplay";
 import { PrayerCard } from "./components/PrayerCard";
 import { CountdownBanner } from "./components/CountdownBanner";
 import { WeatherWidget } from "./components/WeatherWidget";
-import { IslamicPattern } from "./components/IslamicPattern";
 
 export default function App() {
-  useAutoReload(); // schedules daily hard reload at 00:05 for memory & fresh data
+  useAutoReload();
 
   const clock = useClock();
   const { data: prayerData, isStale } = usePrayerTimes();
@@ -28,13 +28,14 @@ export default function App() {
   const nextPrayer = useMemo(
     () => (prayers ? getNextPrayer(prayers) : null),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [prayers, clock.time]
+    [prayers, clock.time],
   );
 
   const countdown = useMemo(
     () =>
       prayers && nextPrayer ? computeCountdown(nextPrayer.key, prayers) : null,
-    [prayers, nextPrayer, clock.time]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [prayers, nextPrayer, clock.time],
   );
 
   const currentMinutes = useMemo(() => {
@@ -44,78 +45,55 @@ export default function App() {
   }, [clock.time]);
 
   return (
-    <div className="takvim-bg relative w-screen h-screen overflow-hidden flex flex-col">
-      <IslamicPattern />
-
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background">
       {/* ── Header ────────────────────────────────────────── */}
-      <header
-        className="relative z-10 flex items-center justify-between px-10 py-4 flex-shrink-0"
-        style={{
-          background: "rgba(7,13,26,0.75)",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
-          backdropFilter: "blur(8px)",
-        }}
-      >
-        {/* Mosque name + location */}
+      <header className="flex shrink-0 items-center justify-between border-b border-border/60 bg-card/80 px-10 py-4 backdrop-blur-sm">
         <div className="flex items-center gap-4">
-          <span className="text-[2.8vw] leading-none">🕌</span>
+          <span className="text-[2.4vw] leading-none">🕌</span>
           <div>
-            <h1 className="text-[1.9vw] font-bold text-white tracking-wider leading-tight">
+            <h1 className="text-[1.8vw] font-semibold tracking-tight leading-tight text-foreground">
               Xhamia Dardania
             </h1>
-            <p
-              className="text-[0.85vw] tracking-[0.3em] uppercase"
-              style={{ color: "rgba(186,230,253,0.45)" }}
-            >
+            <p className="text-[0.8vw] text-muted-foreground tracking-[0.2em] uppercase">
               Prishtinë · Kosovë
             </p>
           </div>
         </div>
 
-        {/* Live clock — center piece */}
+        <Separator orientation="vertical" className="h-10" />
+
         <ClockDisplay clock={clock} />
 
-        {/* Right side — source + stale warning */}
-        <div className="flex flex-col items-end gap-1 min-w-[10vw]">
-          <span
-            className="text-[0.8vw] uppercase tracking-widest"
-            style={{ color: "rgba(186,230,253,0.35)" }}
-          >
+        <Separator orientation="vertical" className="h-10" />
+
+        <div className="flex flex-col items-end gap-1 min-w-[9vw]">
+          <span className="text-muted-foreground/60 text-[0.72vw] uppercase tracking-widest">
             Bashkësia Islame e Kosovës
           </span>
-          <span
-            className="text-[0.85vw] font-medium"
-            style={{ color: "rgba(52,211,153,0.65)" }}
-          >
+          <span className="text-primary text-[0.8vw] font-medium">
             bislame.net/namazet
           </span>
           {isStale && (
-            <span
-              className="text-[0.72vw] animate-pulse"
-              style={{ color: "rgba(251,191,36,0.70)" }}
-            >
-              ⚠ cache — pa lidhje
+            <span className="animate-pulse text-[0.68vw] text-amber-400/70">
+              ⚠ pa lidhje — cache
             </span>
           )}
         </div>
       </header>
 
       {/* ── Countdown banner ──────────────────────────────── */}
-      <div className="relative z-10 flex-shrink-0">
+      <div className="shrink-0">
         {countdown ? (
           <CountdownBanner countdown={countdown} />
         ) : (
-          <div
-            className="py-4 text-center text-[1vw]"
-            style={{ color: "rgba(186,230,253,0.30)" }}
-          >
+          <div className="py-4 text-center text-[1vw] text-muted-foreground/50">
             Duke ngarkuar kohët e namazit…
           </div>
         )}
       </div>
 
-      {/* ── Prayer cards ──────────────────────────────────── */}
-      <main className="relative z-10 flex-1 grid grid-cols-3 grid-rows-2 gap-4 px-8 py-4">
+      {/* ── Prayer cards grid ─────────────────────────────── */}
+      <main className="flex-1 grid grid-cols-3 grid-rows-2 gap-5 px-8 py-5">
         {PRAYER_ORDER.map((key) => {
           const time = prayers?.[key] ?? "--:--";
           const prayerMinutes = prayers ? timeToMinutes(prayers[key]) : -1;
@@ -136,43 +114,24 @@ export default function App() {
         })}
       </main>
 
-      {/* ── Footer / Weather ──────────────────────────────── */}
-      <footer
-        className="relative z-10 flex items-center justify-between px-10 py-3 flex-shrink-0"
-        style={{
-          background: "rgba(7,13,26,0.75)",
-          borderTop: "1px solid rgba(255,255,255,0.08)",
-          backdropFilter: "blur(8px)",
-        }}
-      >
+      {/* ── Footer ────────────────────────────────────────── */}
+      <footer className="flex shrink-0 items-center justify-between border-t border-border/60 bg-card/80 px-10 py-3 backdrop-blur-sm">
         <WeatherWidget weather={weather} loading={weatherLoading} />
 
         <div className="flex flex-col items-center">
-          <p
-            className="text-[0.8vw] uppercase tracking-[0.25em]"
-            style={{ color: "rgba(186,230,253,0.30)" }}
-          >
+          <p className="text-muted-foreground/50 text-[0.75vw] uppercase tracking-[0.2em]">
             Zona kohore
           </p>
-          <p
-            className="text-[0.95vw] font-medium"
-            style={{ color: "rgba(186,230,253,0.55)" }}
-          >
+          <p className="text-foreground/80 text-[0.9vw] font-medium">
             Europe / Belgrade
           </p>
         </div>
 
         <div className="text-right">
-          <p
-            className="text-[0.8vw] uppercase tracking-widest"
-            style={{ color: "rgba(186,230,253,0.30)" }}
-          >
+          <p className="text-muted-foreground/50 text-[0.75vw] uppercase tracking-widest">
             Data e sotme
           </p>
-          <p
-            className="text-[0.95vw] font-medium"
-            style={{ color: "rgba(186,230,253,0.60)" }}
-          >
+          <p className="text-foreground/80 text-[0.9vw] font-medium">
             {prayerData?.date ?? "—"}
           </p>
         </div>

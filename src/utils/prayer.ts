@@ -19,16 +19,6 @@ export const PRAYER_ORDER: PrayerKey[] = [
   "jacia",
 ];
 
-// Icons for each prayer (using unicode / emoji for TV display)
-export const PRAYER_ICONS: Record<PrayerKey, string> = {
-  sabahu: "🌙",
-  lindja: "🌅",
-  dreka: "☀️",
-  ikindia: "🌤️",
-  akshami: "🌇",
-  jacia: "🌃",
-};
-
 export function getNextPrayer(
   prayers: PrayerTimes
 ): { key: PrayerKey; label: string } {

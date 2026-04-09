@@ -9,25 +9,17 @@ export function ClockDisplay({ clock }: Props) {
   const ss = clock.time.slice(6);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-1">
-      {/* Main time */}
-      <div className="flex items-end gap-2 leading-none">
-        <span className="text-[5.5vw] font-bold text-white tabular-nums tracking-tight">
+    <div className="flex flex-col items-center gap-1">
+      <div className="flex items-end gap-1.5 leading-none">
+        <span className="text-foreground text-[5vw] font-bold tabular-nums tracking-tighter">
           {hhmm}
         </span>
-        <span
-          className="text-[2.4vw] font-medium tabular-nums pb-1"
-          style={{ color: "#7dd3fc" }}
-        >
+        <span className="text-muted-foreground text-[2.2vw] font-medium tabular-nums pb-1">
           {ss}
         </span>
       </div>
 
-      {/* Date */}
-      <p
-        className="text-[1.1vw] font-normal tracking-widest uppercase"
-        style={{ color: "rgba(186,230,253,0.60)" }}
-      >
+      <p className="text-muted-foreground/70 text-[0.95vw] font-normal tracking-widest uppercase">
         {clock.date}
       </p>
     </div>
