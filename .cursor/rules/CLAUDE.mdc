@@ -1,0 +1,136 @@
+---
+alwaysApply: true
+---
+## Code Structure Rules
+
+### Functions
+- Keep functions small and focused
+- One responsibility per function
+- Avoid deeply nested logic
+
+### Files & Modules
+- Organize code logically
+- Separate concerns (UI / logic / data)
+- Avoid large monolithic files
+
+### Naming
+- Use meaningful names
+- Avoid abbreviations unless standard
+- Prefer:
+  - `getUserData` over `gud`
+  - `isLoading` over `flag1`
+
+---
+
+## Performance Guidelines
+
+- Avoid unnecessary loops and computations
+- Prefer built-in optimized methods
+- Be mindful of memory usage
+- Optimize only when necessary (not prematurely)
+
+---
+
+## Error Handling
+
+- Always consider failure cases
+- Use try/catch where appropriate
+- Return useful error messages
+- Avoid silent failures
+
+---
+
+## Comments & Documentation
+
+- Write comments only when needed
+- Explain *why*, not *what*
+- Use docstrings for functions if useful
+
+---
+
+## When Generating Code
+
+Always:
+1. Understand the goal clearly
+2. Choose the simplest correct approach
+3. Structure before writing
+4. Write clean code
+5. Review for edge cases
+
+---
+
+## Frontend Rules
+
+- Keep components reusable
+- Avoid unnecessary re-renders
+- Use proper state management
+- Separate UI and logic
+
+---
+
+## Backend Rules
+
+- Validate inputs
+- Sanitize data
+- Handle errors properly
+- Keep endpoints clean and predictable
+
+---
+
+## API Design
+
+- Use clear and consistent routes
+- Follow REST principles where possible
+- Return structured responses:
+  {
+    success: boolean,
+    data: any,
+    error: string | null
+  }
+
+---
+
+## Security Basics
+
+- Never trust user input
+- Validate and sanitize everything
+- Avoid exposing sensitive data
+- Use environment variables for secrets
+
+---
+
+## Testing Mindset
+
+- Think about edge cases
+- Write code that is testable
+- Avoid tightly coupled logic
+
+---
+
+## Output Expectations
+
+When generating code:
+- Provide complete snippets
+- Include imports if needed
+- Ensure code runs without missing parts
+- Avoid placeholders unless necessary
+
+---
+
+## Avoid
+
+- Overengineering
+- Unnecessary dependencies
+- Magic values (use constants)
+- Deep nesting
+- Hardcoded sensitive data
+
+---
+
+## Final Rule
+
+Write code like a senior engineer:
+- clear
+- simple
+- scalable
+- maintainable

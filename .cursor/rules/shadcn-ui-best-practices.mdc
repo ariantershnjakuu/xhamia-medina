@@ -1,0 +1,17 @@
+---
+alwaysApply: true
+---
+# shadcn/ui Best Practices
+
+- Official references:
+  - https://ui.shadcn.com/
+  - https://ui.shadcn.com/docs/components
+  - https://ui.shadcn.com/docs
+
+- Treat shadcn/ui as open code: prefer updating local components in `components/ui/*` instead of building parallel wrappers without clear need.
+- Reuse existing primitives first (`Button`, `Input`, `Dialog`, etc.) before creating new UI components.
+- Follow composition patterns (`asChild`, Radix `Slot`, `data-slot` attributes) to keep APIs consistent and accessible.
+- Use `class-variance-authority` variants for visual states and sizes; avoid ad-hoc class duplication across features.
+- Keep styling token-based and consistent with project design tokens/utilities; avoid one-off hardcoded values unless justified.
+- Preserve accessibility defaults (keyboard interaction, focus states, aria attributes) when customizing components.
+- When adding or changing a component API, keep it minimal and consistent with existing shadcn component patterns in this repo.

@@ -1,0 +1,20 @@
+---
+alwaysApply: true
+---
+
+# Component Size Limit
+
+- Hard limit: a component file must stay at or below 180 lines.
+- Prefer extraction over growth: split long files into focused subcomponents, hooks, or helpers.
+- Keep each extracted module single-purpose and easy to test.
+- Reuse shared UI primitives and utilities instead of duplicating markup or state logic.
+
+## Refactor Pattern
+
+```tsx
+// ❌ Too large: one file handles layout, desktop nav, mobile nav, and state.
+// ✅ Better: keep container component small and extract:
+// - header.desktop-nav.tsx
+// - header.mobile-nav.tsx
+// - header.brand.tsx
+```

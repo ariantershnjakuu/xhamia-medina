@@ -1,0 +1,20 @@
+---
+description: Enforce Zustand best practices for scalable client state
+alwaysApply: true
+---
+
+# Zustand Best Practices
+
+- Official references:
+  - https://zustand.docs.pmnd.rs/learn/getting-started/introduction
+  - https://zustand-demo.pmnd.rs/
+
+- Use Zustand for client state, not server data fetching. Keep server data in Next.js server layer and cache primitives.
+- Keep stores domain-focused and small (one concern per store).
+- Define explicit state/action types and expose a minimal API surface.
+- In components, always select only what you need (`useStore((s) => s.x)`) instead of reading the whole store.
+- Avoid storing derived state when it can be computed from existing fields.
+- Keep actions predictable and side-effect aware; do not hide complex async orchestration inside unrelated actions.
+- When using `persist`, store only stable keys with `partialize`, and use `migrate` for backward compatibility when shape changes.
+- Do not put secrets, auth tokens, or privileged server-only data in Zustand state.
+- Keep store modules independent from UI component files to improve reuse and testing.
