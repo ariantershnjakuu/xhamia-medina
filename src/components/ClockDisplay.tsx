@@ -9,19 +9,23 @@ export function ClockDisplay({ clock }: Props) {
   const ss = clock.time.slice(6);
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-1.5">
       <div className="flex items-end gap-1.5 leading-none">
-        <span className="text-foreground text-[5vw] font-extrabold tabular-nums tracking-tighter">
+        <span className="text-foreground text-[4.8vw] font-black tabular-nums tracking-wide">
           {hhmm}
         </span>
-        <span className="text-foreground/75 text-[2.2vw] font-semibold tabular-nums pb-1">
+        <span className="text-primary/90 text-[2vw] font-bold tabular-nums pb-1.5 countdown-pulse">
           {ss}
         </span>
       </div>
 
-      <p className="text-foreground/70 text-[1.15vw] font-medium tracking-widest uppercase">
-        {clock.date}
-      </p>
+      <div className="flex items-center gap-3">
+        <span className="h-px w-6 bg-border/70" />
+        <p className="text-foreground/75 text-[0.95vw] font-semibold tracking-[0.25em] uppercase">
+          {clock.date}
+        </p>
+        <span className="h-px w-6 bg-border/70" />
+      </div>
     </div>
   );
 }

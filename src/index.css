@@ -32,8 +32,40 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* ─── Deep dark palette — teal on near-black ─────────────── */
+/* ─── Light palette — deep teal on warm ivory (day: Lindja → Akshami) ─
+ *
+ * Design notes:
+ *  - `--background` has very low chroma (0.006) so the warmth reads as
+ *    "paper" instead of "beige", and doesn't fight the teal primary.
+ *  - `--card` is pure white to give real stacked-paper elevation over bg.
+ *  - `--primary` is deeper (L=0.44) and more saturated (C=0.130) than in
+ *    the first pass so the teal has real presence against the light bg.
+ *  - Neutrals are shifted to hue 210 (a touch cool) so caption text reads
+ *    crisp rather than muddy.
+ */
 :root {
+  --background:          oklch(0.96 0.006 80);
+  --foreground:          oklch(0.18 0.012 210);
+  --card:                oklch(1 0 0);
+  --card-foreground:     oklch(0.18 0.012 210);
+  --popover:             oklch(1 0 0);
+  --popover-foreground:  oklch(0.18 0.012 210);
+  --primary:             oklch(0.44 0.130 186.4);
+  --primary-foreground:  oklch(0.99 0.002 186);
+  --secondary:           oklch(0.93 0.008 80);
+  --secondary-foreground:oklch(0.24 0.012 210);
+  --muted:               oklch(0.93 0.008 80);
+  --muted-foreground:    oklch(0.38 0.012 210);
+  --accent:              oklch(0.93 0.008 80);
+  --accent-foreground:   oklch(0.18 0.012 210);
+  --border:              oklch(0.84 0.010 80);
+  --input:               oklch(0.84 0.010 80);
+  --ring:                oklch(0.44 0.130 186.4);
+  --radius:              0.75rem;
+}
+
+/* ─── Dark palette — teal on near-black (night: Akshami → Lindja) ─ */
+.dark {
   --background:          oklch(0.12 0.008 200);
   --foreground:          oklch(0.95 0.005 200);
   --card:                oklch(0.17 0.010 200);
@@ -51,7 +83,6 @@
   --border:              oklch(0.27 0.010 200);
   --input:               oklch(0.27 0.010 200);
   --ring:                oklch(0.58 0.130 186.4);
-  --radius:              0.75rem;
 }
 
 /* ─── Global base ────────────────────────────────────────── */
@@ -68,16 +99,35 @@
     @apply bg-background text-foreground font-sans;
     -webkit-font-smoothing: antialiased;
   }
+  /* Smooth dawn ↔ dusk palette swap. Fires twice a day at Lindja / Akshami. */
+  html {
+    transition:
+      background-color 700ms ease,
+      color 700ms ease;
+  }
+  body {
+    transition: background-color 700ms ease;
+  }
 }
 
 /* ─── TV safe-area / overscan compensation ───────────────── */
 /*
- * TVs typically cut ~5% off the edges (overscan). On a 1080p screen that's
- * ~54 px top/bottom. We bump the footer's bottom padding to ~1.5 rem (24 px)
- * and also respect env(safe-area-inset-bottom) for browsers that expose it.
+ * TVs cut ~5% off the edges (overscan). On a 1080p screen that's ~54 px per
+ * side. We reserve a safe-area on the root container so header & footer are
+ * never clipped. The `--tv-safe-area` custom property is tunable per install.
+ * Defaults: ~3% top/bottom, ~2% left/right — covers most TVs without wasting
+ * too much space on monitors.
  */
-footer {
-  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+:root {
+  --tv-safe-area-y: 2.5vh;
+  --tv-safe-area-x: 1.5vw;
+}
+
+.tv-safe-area {
+  padding-top:    max(var(--tv-safe-area-y), env(safe-area-inset-top));
+  padding-bottom: max(var(--tv-safe-area-y), env(safe-area-inset-bottom));
+  padding-left:   max(var(--tv-safe-area-x), env(safe-area-inset-left));
+  padding-right:  max(var(--tv-safe-area-x), env(safe-area-inset-right));
 }
 
 /* ─── Current prayer card ring pulse ─────────────────────── */
@@ -96,20 +146,6 @@ footer {
 
 .next-prayer-ring {
   animation: next-pulse 2.5s ease-in-out infinite;
-}
-
-/* ─── TANI badge attention glow ──────────────────────────── */
-@keyframes tani-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 2px oklch(0.58 0.130 186.4 / 0.30);
-  }
-  50% {
-    box-shadow: 0 0 0 5px oklch(0.58 0.130 186.4 / 0.55), 0 0 20px oklch(0.58 0.130 186.4 / 0.35);
-  }
-}
-
-.tani-badge {
-  animation: tani-glow 1.8s ease-in-out infinite;
 }
 
 /* ─── Adhan modal animations ─────────────────────────────── */
@@ -153,3 +189,10 @@ footer {
 .adhan-card-in      { animation: adhan-enter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 .adhan-card-out     { animation: adhan-exit  0.4s ease-in forwards; }
 .adhan-glow-pulse   { animation: adhan-glow-pulse 2.5s ease-in-out infinite; }
+
+/* ─── Subtle 1Hz opacity pulse for the seconds digit & clock secs ── */
+@keyframes countdown-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+.countdown-pulse { animation: countdown-pulse 1s ease-in-out infinite; }

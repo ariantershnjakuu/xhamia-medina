@@ -15,11 +15,24 @@
 
     <style>
       body {
-        background: #d8d1c7;
+        background: #f4ede1;
         margin: 0;
         padding: 0;
       }
+      html.dark body {
+        background: #161c1d;
+      }
     </style>
+
+    <script>
+      // No-flash theme init: mirrors the daytime heuristic in useThemeMode.ts
+      // so the correct palette is active before React mounts. Real prayer-time
+      // boundaries take over once the data loads.
+      (function () {
+        var h = new Date().getHours();
+        if (h < 6 || h >= 20) document.documentElement.classList.add('dark');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

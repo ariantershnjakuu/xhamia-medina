@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import type { PrayerKey } from "../types";
 import {
   Moon,
@@ -26,7 +25,6 @@ type Props = {
   time: string;
   iqamahTime: string;
   isCurrent: boolean;
-  isAdhanActive: boolean;
   hideIqamah?: boolean;
 };
 
@@ -36,76 +34,118 @@ export function PrayerCard({
   time,
   iqamahTime,
   isCurrent,
-  isAdhanActive,
   hideIqamah = false,
 }: Props) {
   const Icon = PRAYER_ICONS[prayerKey];
+  const showIqamah = prayerKey !== "lindja" && !hideIqamah;
 
   return (
-    <Card
+    <div
       className={cn(
-        "relative flex h-full flex-col overflow-visible rounded-2xl border transition-all duration-500",
+        "relative flex h-full flex-col overflow-hidden rounded-3xl border transition-all duration-500",
         isCurrent
-          ? "next-prayer-ring bg-primary/35 border-primary/60 scale-[1.025] shadow-lg"
-          : "border-border/50 bg-card shadow-sm",
+          ? "next-prayer-ring border-primary/70 bg-linear-to-br from-primary/25 via-primary/12 to-primary/5 scale-[1.02] shadow-2xl"
+          : "border-border/50 bg-card/90 shadow-md",
       )}
     >
-      {isAdhanActive && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-          <span className="tani-badge inline-flex items-center rounded-full border border-primary/60 bg-primary px-3.5 py-1 text-[0.7vw] font-bold uppercase tracking-[0.25em] text-primary-foreground shadow-md">
-            TANI
-          </span>
-        </div>
-      )}
-
-      {/* Main section: icon + name + time */}
-      <CardContent className="flex flex-1 flex-col items-center justify-center gap-2 px-4 py-0">
+      {/* Prayer name header */}
+      <div className="flex items-center justify-center gap-3 border-b border-border/40 px-5 py-3">
         <Icon
           className={cn(
-            "size-[2vw]",
-            isCurrent ? "text-primary" : "text-foreground",
+            "size-[1.7vw]",
+            isCurrent ? "text-primary" : "text-primary/70",
           )}
-          strokeWidth={1.5}
+          strokeWidth={1.8}
         />
-        <p
+        <h2
           className={cn(
-            "text-[1.3vw] font-extrabold uppercase tracking-widest leading-none",
-            isCurrent ? "text-foreground" : "text-foreground/80",
+            "text-[1.3vw] font-extrabold uppercase tracking-[0.22em] leading-none",
+            isCurrent ? "text-foreground" : "text-foreground/90",
           )}
         >
           {label}
-        </p>
-        <p className="text-[4vw] font-black tabular-nums leading-none text-foreground">
-          {time}
-        </p>
-      </CardContent>
+        </h2>
+      </div>
 
-      {/* Iqamah strip — built-in border-t + bg-muted/50 from CardFooter */}
-      {prayerKey !== "lindja" && !hideIqamah && (
-        <CardFooter
-          className={cn(
-            "justify-center gap-3 py-2.5",
-            isCurrent && "bg-foreground/10",
-          )}
-        >
+      {/* Times — Ezani | Ikameti symmetric columns */}
+      {showIqamah ? (
+        <div className="grid flex-1 grid-cols-2 divide-x divide-border/40">
+          <TimeColumn
+            label="Ezani"
+            value={time}
+            isCurrent={isCurrent}
+            emphasized={false}
+          />
+          <TimeColumn
+            label="Ikameti"
+            value={iqamahTime}
+            isCurrent={isCurrent}
+            emphasized
+          />
+        </div>
+      ) : (
+        // Single centered time for Lindja / Xhuma (no Ikameti)
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5">
           <span
             className={cn(
-              "text-[1.7vw] font-bold uppercase tracking-widest leading-none",
-              isCurrent ? "text-foreground/90" : "text-foreground",
+              "text-[0.75vw] font-semibold uppercase tracking-[0.35em]",
+              isCurrent ? "text-foreground/75" : "text-muted-foreground/80",
             )}
           >
-            Ikameti
+            {prayerKey === "lindja" ? "Lindja" : "Xhumaja"}
           </span>
-          <span
+          <p
             className={cn(
-              "text-[1.8vw] font-black tabular-nums leading-none",
-              isCurrent ? "text-foreground/90" : "text-foreground/85",
+              "text-[4.2vw] font-black tabular-nums leading-none tracking-wide",
+              isCurrent ? "text-foreground" : "text-foreground/90",
             )}
           >
-            {iqamahTime}
-          </span>
-        </CardFooter>
+            {time}
+          </p>
+        </div>
       )}
-    </Card>
+    </div>
+  );
+}
+
+type TimeColumnProps = {
+  label: string;
+  value: string;
+  isCurrent: boolean;
+  /** Ikameti column gets a subtle tinted background to guide the eye */
+  emphasized: boolean;
+};
+
+function TimeColumn({ label, value, isCurrent, emphasized }: TimeColumnProps) {
+  return (
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center gap-3 px-3 py-5",
+        emphasized && (isCurrent ? "bg-primary/20" : "bg-primary/10"),
+      )}
+    >
+      <span
+        className={cn(
+          "text-[1.35vw] font-extrabold uppercase tracking-[0.3em] leading-none",
+          emphasized
+            ? isCurrent
+              ? "text-foreground"
+              : "text-primary"
+            : isCurrent
+              ? "text-foreground/85"
+              : "text-foreground/70",
+        )}
+      >
+        {label}
+      </span>
+      <p
+        className={cn(
+          "text-[3.8vw] font-black tabular-nums leading-none tracking-wide",
+          isCurrent ? "text-foreground" : "text-foreground",
+        )}
+      >
+        {value}
+      </p>
+    </div>
   );
 }

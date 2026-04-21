@@ -1,3 +1,4 @@
+import { Timer } from "lucide-react";
 import type { Countdown } from "../types";
 import { pad2 } from "../utils/time";
 
@@ -9,17 +10,20 @@ export function CountdownBanner({ countdown }: Props) {
   const { prayerLabel, hours, minutes, seconds } = countdown;
 
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-stretch divide-x divide-border/40 border-t-2 border-t-primary/20 border-b border-b-border/50 bg-card/75 backdrop-blur-sm">
-      <div className="flex flex-col items-end justify-center gap-1 px-10 py-3">
-        <span className="text-muted-foreground/80 text-[1.1wvw] font-semibold uppercase tracking-widest">
+    <div className="relative grid grid-cols-[1fr_auto_1fr] items-stretch border-y border-border/50 bg-linear-to-r from-card/60 via-card/90 to-card/60 backdrop-blur-sm">
+      {/* Left: next prayer label */}
+      <div className="flex flex-col items-end justify-center gap-1 px-10 py-4">
+        <span className="flex items-center gap-2 text-muted-foreground/85 text-[0.85vw] font-semibold uppercase tracking-[0.28em]">
+          <Timer className="size-[0.9vw] text-primary/80" strokeWidth={2.2} />
           Namazi i radhës
         </span>
-        <span className="text-foreground text-2xl font-extrabold leading-tight uppercase">
+        <span className="text-foreground text-[1.9vw] font-extrabold leading-none uppercase tracking-tight">
           {prayerLabel}
         </span>
       </div>
 
-      <div className="flex items-center justify-center gap-0 px-10 py-3">
+      {/* Center: countdown */}
+      <div className="flex items-end justify-center gap-2 px-8 py-3">
         {hours > 0 && (
           <>
             <DigitBlock value={hours} label="orë" />
@@ -28,14 +32,15 @@ export function CountdownBanner({ countdown }: Props) {
         )}
         <DigitBlock value={minutes} label="minuta" />
         <ColonSep />
-        <DigitBlock value={seconds} label="sekonda" />
+        <DigitBlock value={seconds} label="sekonda" pulse />
       </div>
 
-      <div className="flex flex-col items-start justify-center gap-1 px-10 py-3">
-        <span className="text-muted-foreground/80 text-sm font-semibold uppercase tracking-[0.25em]">
+      {/* Right: location */}
+      <div className="flex flex-col items-start justify-center gap-1 px-10 py-4">
+        <span className="text-muted-foreground/85 text-[0.85vw] font-semibold uppercase tracking-[0.28em]">
           Vendndodhja
         </span>
-        <span className="text-foreground/90 text-lg font-semibold leading-tight">
+        <span className="text-foreground text-[1.9vw] font-extrabold leading-none tracking-tight">
           Prishtinë, Kosovë
         </span>
       </div>
@@ -43,13 +48,25 @@ export function CountdownBanner({ countdown }: Props) {
   );
 }
 
-function DigitBlock({ value, label }: { value: number; label: string }) {
+function DigitBlock({
+  value,
+  label,
+  pulse = false,
+}: {
+  value: number;
+  label: string;
+  pulse?: boolean;
+}) {
   return (
-    <div className="flex min-w-20 flex-col items-center">
-      <span className="text-primary text-[3.2vw] font-extrabold tabular-nums leading-none">
+    <div className="flex min-w-[4.5vw] flex-col items-center">
+      <span
+        className={`text-primary text-[3.4vw] font-black tabular-nums leading-none ${
+          pulse ? "countdown-pulse" : ""
+        }`}
+      >
         {pad2(value)}
       </span>
-      <span className="mt-1 text-muted-foreground/70 text-sm uppercase tracking-[0.3em]">
+      <span className="mt-1.5 text-muted-foreground/75 text-[0.7vw] font-semibold uppercase tracking-[0.3em]">
         {label}
       </span>
     </div>
@@ -58,7 +75,7 @@ function DigitBlock({ value, label }: { value: number; label: string }) {
 
 function ColonSep() {
   return (
-    <span className="mx-1.5 -mt-2 text-primary/50 text-[2.8vw] font-light leading-none">
+    <span className="mx-0.5 self-start pt-1 text-primary/45 text-[2.6vw] font-light leading-none">
       :
     </span>
   );

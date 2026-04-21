@@ -1,8 +1,44 @@
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Wind } from "lucide-react";
+import {
+  Wind,
+  Sun,
+  CloudSun,
+  Cloud,
+  CloudFog,
+  CloudDrizzle,
+  CloudRain,
+  CloudSnow,
+  CloudLightning,
+  Thermometer,
+  type LucideIcon,
+} from "lucide-react";
 import type { WeatherData } from "../types";
-import { WEATHER_ICONS, getWeatherLabel } from "../hooks/useWeather";
+import { getWeatherLabel } from "../hooks/useWeather";
+
+const WEATHER_LUCIDE: Record<number, LucideIcon> = {
+  0: Sun,
+  1: Sun,
+  2: CloudSun,
+  3: Cloud,
+  45: CloudFog,
+  48: CloudFog,
+  51: CloudDrizzle,
+  53: CloudDrizzle,
+  55: CloudDrizzle,
+  61: CloudRain,
+  63: CloudRain,
+  65: CloudRain,
+  71: CloudSnow,
+  73: CloudSnow,
+  75: CloudSnow,
+  80: CloudRain,
+  81: CloudRain,
+  82: CloudLightning,
+  95: CloudLightning,
+  96: CloudLightning,
+  99: CloudLightning,
+};
 
 type Props = {
   weather: WeatherData | null;
@@ -30,30 +66,37 @@ export function WeatherWidget({ weather, loading }: Props) {
     );
   }
 
-  const icon = WEATHER_ICONS[weather.weatherCode] ?? "🌡️";
+  const Icon = WEATHER_LUCIDE[weather.weatherCode] ?? Thermometer;
   const label = getWeatherLabel(weather.weatherCode);
 
   return (
     <div className="flex items-center gap-4">
-      <span className="text-[2.2vw] leading-none">{icon}</span>
+      <div className="flex size-[2.8vw] items-center justify-center rounded-xl bg-primary/15 border border-primary/25">
+        <Icon
+          className="size-[1.6vw] text-primary"
+          strokeWidth={1.8}
+        />
+      </div>
 
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-0.5">
         <span className="text-foreground text-[1.9vw] font-extrabold tabular-nums leading-none">
           {weather.temperature}°C
         </span>
-        <span className="text-muted-foreground/80 text-[0.78vw] font-medium leading-tight tracking-wide">
+        <span className="text-muted-foreground/85 text-[0.78vw] font-medium leading-tight tracking-wide">
           {label}
         </span>
       </div>
 
-      <Separator orientation="vertical" className="h-7 mx-1" />
+      <Separator orientation="vertical" className="h-8 mx-1" />
 
       <div className="flex flex-col gap-0.5">
-        <span className="flex items-center gap-1 text-foreground/80 text-[0.9vw] font-semibold tabular-nums">
-          <Wind className="size-[0.85vw] text-muted-foreground/70" strokeWidth={2} />
+        <span className="flex items-center gap-1.5 text-foreground/85 text-[0.95vw] font-semibold tabular-nums leading-none">
+          <Wind className="size-[0.9vw] text-muted-foreground/70" strokeWidth={2} />
           {weather.windSpeed} km/h
         </span>
-        <span className="text-muted-foreground/70 text-[0.7vw] uppercase tracking-[0.2em]">erë</span>
+        <span className="text-muted-foreground/75 text-[0.7vw] font-semibold uppercase tracking-[0.25em]">
+          Erë
+        </span>
       </div>
     </div>
   );
