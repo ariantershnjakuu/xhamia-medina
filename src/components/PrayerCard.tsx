@@ -36,6 +36,18 @@ export function PrayerCard({
 }: Props) {
   const Icon = PRAYER_ICONS[prayerKey];
 
+  const getEzanText = () => {
+    if (label === "E Xhuma") return "Ezani i Xhumasë";
+    switch (prayerKey) {
+      case "sabahu": return "Ezani i Sabahut";
+      case "dreka": return "Ezani i Drekës";
+      case "ikindia": return "Ezani i Ikindisë";
+      case "akshami": return "Ezani i Akshamit";
+      case "jacia": return "Ezani i Jacisë";
+      default: return `Ezani i ${label}`;
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -83,11 +95,11 @@ export function PrayerCard({
         <div className="flex flex-1 flex-col items-center justify-center gap-2 px-5">
           <span
             className={cn(
-              "text-[0.85vw] font-semibold uppercase tracking-[0.35em]",
+              "text-[1.1vw] font-semibold uppercase tracking-[0.35em]",
               isCurrent ? "text-foreground/75" : "text-muted-foreground/80",
             )}
           >
-            {prayerKey === "lindja" ? "Lindja" : (label === "E Xhuma" ? "Xhumaja" : "Koha e Namazit")}
+            {prayerKey === "lindja" ? "Lindja e Diellit" : getEzanText()}
           </span>
           <p
             className={cn(
