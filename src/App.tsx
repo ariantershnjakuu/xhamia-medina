@@ -4,6 +4,7 @@ import { usePrayerTimes } from "./hooks/usePrayerTimes";
 import { useWeather } from "./hooks/useWeather";
 import { useAutoReload } from "./hooks/useAutoReload";
 import { useThemeMode } from "./hooks/useThemeMode";
+import { useFullscreenKiosk } from "./hooks/useFullscreenKiosk";
 import {
   PRAYER_ORDER,
   PRAYER_LABELS,
@@ -12,6 +13,7 @@ import {
   getNextPrayer,
   getCurrentPrayer,
   computeCountdown,
+  getIqamahTime,
 } from "./utils/prayer";
 import { timeToMinutes, nowInBelgrade, isFridayInBelgrade, pad2 } from "./utils/time";
 import { ClockDisplay } from "./components/ClockDisplay";
@@ -19,7 +21,7 @@ import { PrayerCard } from "./components/PrayerCard";
 import { CountdownBanner } from "./components/CountdownBanner";
 import { WeatherWidget } from "./components/WeatherWidget";
 import { PrayerModal, type PrayerModalSpec } from "./components/PrayerModal";
-import { ADHAN_DUA } from "./utils/dua";
+import { ADHAN_DUA, IQAMAH_AYAH } from "./utils/dua";
 import { WifiOff } from "lucide-react";
 
 /** Max time either the adhan or iqamah modal stays on screen. */
@@ -34,6 +36,7 @@ const REMINDER_WINDOW_MINUTES = 2;
 
 export default function App() {
   useAutoReload();
+  const { hasInteracted } = useFullscreenKiosk();
 
   const clock = useClock();
   const { data: prayerData, isStale } = usePrayerTimes();
@@ -80,14 +83,33 @@ export default function App() {
     for (const key of PRAYER_ORDER) {
       if (!ADHAN_PRAYER_KEYS.has(key)) continue;
       const prayerMinutes = timeToMinutes(prayers[key]);
-      const adhanEnd = prayerMinutes + MODAL_DURATION_MINUTES;
+      const iqamahTime = getIqamahTime(key, prayers[key]);
+      const iqamahMinutes = iqamahTime ? timeToMinutes(iqamahTime) : prayerMinutes + MODAL_DURATION_MINUTES;
+      const adhanEnd = Math.min(prayerMinutes + MODAL_DURATION_MINUTES, iqamahMinutes);
       if (currentMinutes >= prayerMinutes && currentMinutes < adhanEnd) return key;
     }
     return null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prayers, currentMinutes]);
 
-  // Minutes until the next scheduled adhan event. Used to keep the
+  const iqamahActivePrayerKey = useMemo(() => {
+    if (!prayers) return null;
+    for (const key of PRAYER_ORDER) {
+      if (!ADHAN_PRAYER_KEYS.has(key)) continue;
+      const iqamahTime = getIqamahTime(key, prayers[key]);
+      if (!iqamahTime) continue;
+      const iqamahMinutes = timeToMinutes(iqamahTime);
+      if (
+        currentMinutes >= iqamahMinutes &&
+        currentMinutes < iqamahMinutes + MODAL_DURATION_MINUTES
+      )
+        return key;
+    }
+    return null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prayers, currentMinutes]);
+
+  // Minutes until the next scheduled adhan or iqamah event. Used to keep the
   // reminder from opening if it would be interrupted mid-window by another
   // modal (which would otherwise visually overlap during the exit animation).
   const minutesToNextScheduledModal = useMemo(() => {
@@ -96,7 +118,9 @@ export default function App() {
     for (const key of PRAYER_ORDER) {
       if (!ADHAN_PRAYER_KEYS.has(key)) continue;
       const adhanMin = timeToMinutes(prayers[key]);
-      for (const m of [adhanMin]) {
+      const iqamahTime = getIqamahTime(key, prayers[key]);
+      const modes = iqamahTime ? [adhanMin, timeToMinutes(iqamahTime)] : [adhanMin];
+      for (const m of modes) {
         const delta = m - currentMinutes;
         if (delta >= 0 && delta < min) min = delta;
       }
@@ -104,11 +128,27 @@ export default function App() {
     return min;
   }, [prayers, currentMinutes]);
 
+  // True while we're inside the adhan → iqamah gap for any prayer.
+  const isBetweenAdhanAndIqamah = useMemo(() => {
+    if (!prayers) return false;
+    for (const key of PRAYER_ORDER) {
+      if (!ADHAN_PRAYER_KEYS.has(key)) continue;
+      const adhanMin = timeToMinutes(prayers[key]);
+      const iqamahTime = getIqamahTime(key, prayers[key]);
+      if (!iqamahTime) continue;
+      const iqamahMin = timeToMinutes(iqamahTime);
+      if (currentMinutes >= adhanMin && currentMinutes < iqamahMin) return true;
+    }
+    return false;
+  }, [prayers, currentMinutes]);
+
   // Reminder modal: show at every 10-min boundary for REMINDER_WINDOW_MINUTES,
-  // but never while — or just before — the adhan modal is visible.
+  // but never while — or just before — the adhan or iqamah modal is visible,
+  // nor anywhere inside the adhan → iqamah gap.
   const reminderPrayerKey = useMemo(() => {
     if (!prayers || !nextPrayer) return null;
-    if (activePrayerKey) return null;
+    if (activePrayerKey || iqamahActivePrayerKey) return null;
+    if (isBetweenAdhanAndIqamah) return null;
     if (currentMinutes % 10 >= REMINDER_WINDOW_MINUTES) return null;
     // Skip entirely if another modal will fire during this window.
     if (minutesToNextScheduledModal < REMINDER_WINDOW_MINUTES) return null;
@@ -117,6 +157,8 @@ export default function App() {
     prayers,
     nextPrayer,
     activePrayerKey,
+    iqamahActivePrayerKey,
+    isBetweenAdhanAndIqamah,
     currentMinutes,
     minutesToNextScheduledModal,
   ]);
@@ -142,6 +184,14 @@ export default function App() {
         content: <AdhanModalContent />,
       };
     }
+    if (iqamahActivePrayerKey) {
+      return {
+        id: `iqamah:${iqamahActivePrayerKey}`,
+        prayerKey: iqamahActivePrayerKey,
+        title: "Namazi po fillon",
+        content: <IqamahModalContent />,
+      };
+    }
     if (reminderPrayerKey) {
       return {
         id: `reminder:${reminderPrayerKey}`,
@@ -159,6 +209,7 @@ export default function App() {
     return null;
   }, [
     activePrayerKey,
+    iqamahActivePrayerKey,
     reminderPrayerKey,
     isFriday,
     reminderLabel,
@@ -167,15 +218,15 @@ export default function App() {
   ]);
 
   return (
-    <div className="tv-safe-area flex h-screen w-screen flex-col overflow-hidden bg-background">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-background">
       {/* ── Header ────────────────────────────────────────── */}
       <header className="grid grid-cols-3 shrink-0 items-center border-b border-border/60 bg-card/80 px-10 py-4 backdrop-blur-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex size-[3.5vw] items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 p-1.5">
+        <div className="flex items-end gap-4">
+          <div className="flex size-[3.5vw] items-center justify-center">
             <img
-              src="https://bislame.net/wp-content/uploads/2017/01/logore.png"
+              src="/public/xhamia-medina-logo.png"
               alt="Xhamia Medina"
-              className="size-full object-contain"
+              className="dark:invert"
             />
           </div>
           <div className="flex flex-col gap-0.5">
@@ -224,6 +275,7 @@ export default function App() {
         {PRAYER_ORDER.map((key) => {
           const time = prayers?.[key] ?? "--:--";
           const isCurrent = currentPrayer?.key === key;
+          const iqamahTime = time !== "--:--" ? getIqamahTime(key, time) : null;
 
           const isFridayDreka = isFriday && key === "dreka";
           const label = isFridayDreka ? "E Xhuma" : PRAYER_LABELS[key];
@@ -234,6 +286,7 @@ export default function App() {
               prayerKey={key}
               label={label}
               time={time}
+              iqamahTime={iqamahTime}
               isCurrent={isCurrent}
             />
           );
@@ -258,6 +311,23 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* ── Kiosk Entry Overlay ───────────────────────────── */}
+      {!hasInteracted && (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 backdrop-blur-lg text-white">
+          <div className="flex flex-col items-center animate-pulse">
+            <svg className="size-[8vw] mb-6 text-white/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+            </svg>
+            <h2 className="text-[3vw] font-black tracking-widest uppercase text-center">
+              Kiosk Mode
+            </h2>
+            <p className="text-[1.3vw] font-medium text-white/70 mt-3 tracking-widest uppercase">
+              Prek ekranin ose shtyp një buton për të filluar
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -295,6 +365,44 @@ function AdhanModalContent() {
         style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.75s ease forwards" }}
       >
         {ADHAN_DUA.english}
+      </p>
+    </>
+  );
+}
+
+function IqamahModalContent() {
+  return (
+    <>
+      <h3
+        className="text-center text-[1.5vw] font-bold leading-none tracking-[0.4em] text-white/70 uppercase"
+        style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.4s ease forwards" }}
+      >
+        Ajet Kur&apos;anor
+      </h3>
+      <p
+        className="text-center text-[4.2vw] font-medium leading-[1.7] text-white max-w-[82vw]"
+        dir="rtl"
+        lang="ar"
+        style={{
+          fontFamily: "'Noto Naskh Arabic', 'Amiri', serif",
+          opacity: 0,
+          animation: "adhan-text-in 0.5s 0.5s ease forwards",
+        }}
+      >
+        {IQAMAH_AYAH.arabic}
+      </p>
+      <div className="h-px w-[8vw] bg-white/25" />
+      <p
+        className="text-center text-[2.2vw] font-medium leading-[1.55] text-white/95 max-w-[78vw]"
+        style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.6s ease forwards" }}
+      >
+        {IQAMAH_AYAH.albanian}
+      </p>
+      <p
+        className="text-center text-[1.4vw] font-semibold tracking-[0.32em] text-white/55 uppercase"
+        style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.75s ease forwards" }}
+      >
+        — {IQAMAH_AYAH.source}
       </p>
     </>
   );
@@ -360,9 +468,8 @@ function ReminderDigit({
   return (
     <div className="flex min-w-[9.5vw] flex-col items-center">
       <span
-        className={`text-white text-[8.5vw] font-black tabular-nums leading-none ${
-          pulse ? "countdown-pulse" : ""
-        }`}
+        className={`text-white text-[8.5vw] font-black tabular-nums leading-none ${pulse ? "countdown-pulse" : ""
+          }`}
       >
         {pad2(value)}
       </span>

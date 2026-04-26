@@ -1,22 +1,18 @@
 import type { PrayerKey, PrayerTimes, Countdown } from "../types";
 import { timeToMinutes, nowInBelgrade, pad2, getBelgradeUTCOffsetHours } from "./time";
 
-const IQAMAH_OFFSET_MINUTES: Record<PrayerKey, number> = {
-  sabahu: 5,
-  lindja: 10,
-  dreka: 15,
-  ikindia: 10,
-  akshami: 5,
-  jacia: 10,
+const IQAMAH_OFFSET_MINUTES: Partial<Record<PrayerKey, number>> = {
+  sabahu: 15,
 };
 
 /**
- * Sabahu Adhan at this mosque is always 35 minutes before Lindja e Diellit.
+ * Sabahu Adhan at this mosque is 45 minutes before Lindja e Diellit.
+
  * Apply this rule once after fetching so all downstream consumers are consistent.
  */
 export function applyMosqueRules(prayers: PrayerTimes): PrayerTimes {
   const [lh, lm] = prayers.lindja.split(":").map(Number);
-  const sabahuMinutes = lh * 60 + lm - 35;
+  const sabahuMinutes = lh * 60 + lm - 45;
   const sabahuH = Math.floor(sabahuMinutes / 60) % 24;
   const sabahuM = sabahuMinutes % 60;
 
@@ -30,9 +26,11 @@ export function applyMosqueRules(prayers: PrayerTimes): PrayerTimes {
   };
 }
 
-export function getIqamahTime(prayerKey: PrayerKey, adhanTime: string): string {
+export function getIqamahTime(prayerKey: PrayerKey, adhanTime: string): string | null {
+  const offset = IQAMAH_OFFSET_MINUTES[prayerKey];
+  if (offset === undefined) return null;
   const [h, m] = adhanTime.split(":").map(Number);
-  const totalMinutes = h * 60 + m + IQAMAH_OFFSET_MINUTES[prayerKey];
+  const totalMinutes = h * 60 + m + offset;
   const iqamahH = Math.floor(totalMinutes / 60) % 24;
   const iqamahM = totalMinutes % 60;
   return `${pad2(iqamahH)}:${pad2(iqamahM)}`;
