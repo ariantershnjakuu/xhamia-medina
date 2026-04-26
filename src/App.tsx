@@ -12,7 +12,6 @@ import {
   getNextPrayer,
   getCurrentPrayer,
   computeCountdown,
-  getIqamahTime,
 } from "./utils/prayer";
 import { timeToMinutes, nowInBelgrade, isFridayInBelgrade, pad2 } from "./utils/time";
 import { ClockDisplay } from "./components/ClockDisplay";
@@ -20,7 +19,7 @@ import { PrayerCard } from "./components/PrayerCard";
 import { CountdownBanner } from "./components/CountdownBanner";
 import { WeatherWidget } from "./components/WeatherWidget";
 import { PrayerModal, type PrayerModalSpec } from "./components/PrayerModal";
-import { ADHAN_DUA, IQAMAH_AYAH } from "./utils/dua";
+import { ADHAN_DUA } from "./utils/dua";
 import { WifiOff } from "lucide-react";
 
 /** Max time either the adhan or iqamah modal stays on screen. */
@@ -81,31 +80,14 @@ export default function App() {
     for (const key of PRAYER_ORDER) {
       if (!ADHAN_PRAYER_KEYS.has(key)) continue;
       const prayerMinutes = timeToMinutes(prayers[key]);
-      const iqamahMinutes = timeToMinutes(getIqamahTime(key, prayers[key]));
-      // Cap adhan modal at 4 min so it doesn't linger until iqamah (which can be 5–15 min later).
-      const adhanEnd = Math.min(prayerMinutes + MODAL_DURATION_MINUTES, iqamahMinutes);
+      const adhanEnd = prayerMinutes + MODAL_DURATION_MINUTES;
       if (currentMinutes >= prayerMinutes && currentMinutes < adhanEnd) return key;
     }
     return null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prayers, currentMinutes]);
 
-  const iqamahActivePrayerKey = useMemo(() => {
-    if (!prayers) return null;
-    for (const key of PRAYER_ORDER) {
-      if (!ADHAN_PRAYER_KEYS.has(key)) continue;
-      const iqamahMinutes = timeToMinutes(getIqamahTime(key, prayers[key]));
-      if (
-        currentMinutes >= iqamahMinutes &&
-        currentMinutes < iqamahMinutes + MODAL_DURATION_MINUTES
-      )
-        return key;
-    }
-    return null;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prayers, currentMinutes]);
-
-  // Minutes until the next scheduled adhan or iqamah event. Used to keep the
+  // Minutes until the next scheduled adhan event. Used to keep the
   // reminder from opening if it would be interrupted mid-window by another
   // modal (which would otherwise visually overlap during the exit animation).
   const minutesToNextScheduledModal = useMemo(() => {
@@ -114,8 +96,7 @@ export default function App() {
     for (const key of PRAYER_ORDER) {
       if (!ADHAN_PRAYER_KEYS.has(key)) continue;
       const adhanMin = timeToMinutes(prayers[key]);
-      const iqamahMin = timeToMinutes(getIqamahTime(key, prayers[key]));
-      for (const m of [adhanMin, iqamahMin]) {
+      for (const m of [adhanMin]) {
         const delta = m - currentMinutes;
         if (delta >= 0 && delta < min) min = delta;
       }
@@ -123,27 +104,11 @@ export default function App() {
     return min;
   }, [prayers, currentMinutes]);
 
-  // True while we're inside the adhan → iqamah gap for any prayer. The adhan
-  // modal itself only stays up for MODAL_DURATION_MINUTES, but the gap can be
-  // 5–15 min long; the reminder must stay hidden for the whole gap.
-  const isBetweenAdhanAndIqamah = useMemo(() => {
-    if (!prayers) return false;
-    for (const key of PRAYER_ORDER) {
-      if (!ADHAN_PRAYER_KEYS.has(key)) continue;
-      const adhanMin = timeToMinutes(prayers[key]);
-      const iqamahMin = timeToMinutes(getIqamahTime(key, prayers[key]));
-      if (currentMinutes >= adhanMin && currentMinutes < iqamahMin) return true;
-    }
-    return false;
-  }, [prayers, currentMinutes]);
-
   // Reminder modal: show at every 10-min boundary for REMINDER_WINDOW_MINUTES,
-  // but never while — or just before — the adhan or iqamah modal is visible,
-  // nor anywhere inside the adhan → iqamah gap.
+  // but never while — or just before — the adhan modal is visible.
   const reminderPrayerKey = useMemo(() => {
     if (!prayers || !nextPrayer) return null;
-    if (activePrayerKey || iqamahActivePrayerKey) return null;
-    if (isBetweenAdhanAndIqamah) return null;
+    if (activePrayerKey) return null;
     if (currentMinutes % 10 >= REMINDER_WINDOW_MINUTES) return null;
     // Skip entirely if another modal will fire during this window.
     if (minutesToNextScheduledModal < REMINDER_WINDOW_MINUTES) return null;
@@ -152,8 +117,6 @@ export default function App() {
     prayers,
     nextPrayer,
     activePrayerKey,
-    iqamahActivePrayerKey,
-    isBetweenAdhanAndIqamah,
     currentMinutes,
     minutesToNextScheduledModal,
   ]);
@@ -166,10 +129,7 @@ export default function App() {
   const reminderTime =
     reminderPrayerKey && prayers ? prayers[reminderPrayerKey] : "--:--";
 
-  // Single priority-ordered modal slot. Only one of adhan/iqamah/reminder can
-  // occupy the screen at any time — this makes it structurally impossible for
-  // the reminder to stack on top of the adhan/iqamah during transitions.
-  // Priority: adhan > iqamah > reminder.
+  // Single priority-ordered modal slot.
   const modalSpec = useMemo<PrayerModalSpec | null>(() => {
     if (activePrayerKey) {
       return {
@@ -180,14 +140,6 @@ export default function App() {
             ? "Koha e Namazit të Xhumasë"
             : PRAYER_MODAL_TITLES[activePrayerKey],
         content: <AdhanModalContent />,
-      };
-    }
-    if (iqamahActivePrayerKey) {
-      return {
-        id: `iqamah:${iqamahActivePrayerKey}`,
-        prayerKey: iqamahActivePrayerKey,
-        title: "Namazi po fillon",
-        content: <IqamahModalContent />,
       };
     }
     if (reminderPrayerKey) {
@@ -207,7 +159,6 @@ export default function App() {
     return null;
   }, [
     activePrayerKey,
-    iqamahActivePrayerKey,
     reminderPrayerKey,
     isFriday,
     reminderLabel,
@@ -223,13 +174,13 @@ export default function App() {
           <div className="flex size-[3.5vw] items-center justify-center rounded-2xl border border-primary/30 bg-primary/10 p-1.5">
             <img
               src="https://bislame.net/wp-content/uploads/2017/01/logore.png"
-              alt="Xhamia Dardania"
+              alt="Xhamia Medina"
               className="size-full object-contain"
             />
           </div>
           <div className="flex flex-col gap-0.5">
             <h1 className="text-[1.5vw] font-black leading-none text-foreground uppercase">
-              Xhamia Dardania
+              Xhamia Medina
             </h1>
             <p className="text-[0.78vw] font-semibold text-primary/85 tracking-[0.28em] uppercase">
               Prishtinë · Kosovë
@@ -273,8 +224,6 @@ export default function App() {
         {PRAYER_ORDER.map((key) => {
           const time = prayers?.[key] ?? "--:--";
           const isCurrent = currentPrayer?.key === key;
-          const iqamahTime =
-            time !== "--:--" ? getIqamahTime(key, time) : "--:--";
 
           const isFridayDreka = isFriday && key === "dreka";
           const label = isFridayDreka ? "E Xhuma" : PRAYER_LABELS[key];
@@ -285,9 +234,7 @@ export default function App() {
               prayerKey={key}
               label={label}
               time={time}
-              iqamahTime={iqamahTime}
               isCurrent={isCurrent}
-              hideIqamah={isFridayDreka}
             />
           );
         })}
@@ -348,44 +295,6 @@ function AdhanModalContent() {
         style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.75s ease forwards" }}
       >
         {ADHAN_DUA.english}
-      </p>
-    </>
-  );
-}
-
-function IqamahModalContent() {
-  return (
-    <>
-      <h3
-        className="text-center text-[1.5vw] font-bold leading-none tracking-[0.4em] text-white/70 uppercase"
-        style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.4s ease forwards" }}
-      >
-        Ajet Kur&apos;anor
-      </h3>
-      <p
-        className="text-center text-[4.2vw] font-medium leading-[1.7] text-white max-w-[82vw]"
-        dir="rtl"
-        lang="ar"
-        style={{
-          fontFamily: "'Noto Naskh Arabic', 'Amiri', serif",
-          opacity: 0,
-          animation: "adhan-text-in 0.5s 0.5s ease forwards",
-        }}
-      >
-        {IQAMAH_AYAH.arabic}
-      </p>
-      <div className="h-px w-[8vw] bg-white/25" />
-      <p
-        className="text-center text-[2.2vw] font-medium leading-[1.55] text-white/95 max-w-[78vw]"
-        style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.6s ease forwards" }}
-      >
-        {IQAMAH_AYAH.albanian}
-      </p>
-      <p
-        className="text-center text-[1.4vw] font-semibold tracking-[0.32em] text-white/55 uppercase"
-        style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.75s ease forwards" }}
-      >
-        — {IQAMAH_AYAH.source}
       </p>
     </>
   );
