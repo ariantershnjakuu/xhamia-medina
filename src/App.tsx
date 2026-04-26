@@ -224,7 +224,7 @@ export default function App() {
         <div className="flex items-end gap-4">
           <div className="flex size-[3.5vw] items-center justify-center">
             <img
-              src="/public/xhamia-medina-logo.png"
+              src="https://bislame.net/wp-content/uploads/2017/01/logore.png"
               alt="Xhamia Medina"
               className="dark:invert"
             />
