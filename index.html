@@ -1,41 +1,43 @@
 <!doctype html>
 <html lang="sq">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="description" content="Takvim - Xhamia Dardania, Prishtinë" />
-    <title>Takvim — Xhamia Dardania</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
-      rel="stylesheet"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Takvim - Xhamia Medina, Prishtinë" />
+  <title>Takvim — Xhamia Medina</title>
 
-    <style>
-      body {
-        background: #f4ede1;
-        margin: 0;
-        padding: 0;
-      }
-      html.dark body {
-        background: #161c1d;
-      }
-    </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet" />
 
-    <script>
-      // No-flash theme init: mirrors the daytime heuristic in useThemeMode.ts
-      // so the correct palette is active before React mounts. Real prayer-time
-      // boundaries take over once the data loads.
-      (function () {
-        var h = new Date().getHours();
-        if (h < 6 || h >= 20) document.documentElement.classList.add('dark');
-      })();
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  <style>
+    body {
+      background: #f4ede1;
+      margin: 0;
+      padding: 0;
+    }
+
+    html.dark body {
+      background: #161c1d;
+    }
+  </style>
+
+  <script>
+    // No-flash theme init: mirrors the daytime heuristic in useThemeMode.ts
+    // so the correct palette is active before React mounts. Real prayer-time
+    // boundaries take over once the data loads.
+    (function () {
+      var h = new Date().getHours();
+      if (h < 6 || h >= 20) document.documentElement.classList.add('dark');
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

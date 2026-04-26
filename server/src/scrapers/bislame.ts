@@ -52,7 +52,7 @@ export async function scrapePrayerTimes(): Promise<PrayerTimes> {
   const res = await fetch("https://bislame.net/namazet/", {
     headers: {
       "User-Agent":
-        "Mozilla/5.0 (compatible; XhamiaDardania/1.0; +https://xhamia-dardania.com)",
+        "Mozilla/5.0 (compatible; XhamiaMedina/1.0; +https://xhamia-medina.com)",
       Accept: "text/html",
     },
     signal: AbortSignal.timeout(10_000),

@@ -1,4 +1,4 @@
-# Takvim — Xhamia Dardania
+# Takvim — Xhamia Medina
 
 A production-ready **fullscreen mosque prayer times dashboard** for a TV display in Prishtinë, Kosovë.
 
@@ -34,7 +34,7 @@ Built with **Vite + React 19 + TypeScript + Tailwind CSS v4**.
 ## Project Structure
 
 ```
-xhamia-dardania/
+xhamia-medina/
 ├── server/               # Express API (port 3001)
 │   └── src/
 │       ├── scrapers/     # bislame.net HTML scraper
