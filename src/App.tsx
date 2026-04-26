@@ -226,7 +226,6 @@ export default function App() {
             <img
               src="https://bislame.net/wp-content/uploads/2017/01/logore.png"
               alt="Xhamia Medina"
-              className="dark:invert"
             />
           </div>
           <div className="flex flex-col gap-0.5">
