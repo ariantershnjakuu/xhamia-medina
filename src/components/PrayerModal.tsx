@@ -79,11 +79,11 @@ export function PrayerModal({ spec }: Props) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/25 backdrop-blur-xl ${backdropClass}`}
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center gap-[3vh] bg-primary tv-safe-area ${backdropClass}`}
     >
       <div
         key={cached.id}
-        className={`adhan-glow-pulse relative mx-auto flex w-[92vw] max-w-none flex-col items-center gap-10 rounded-[2.5rem] border border-primary/30 bg-primary/85 px-20 py-14 shadow-2xl ${cardClass}`}
+        className={`flex w-full flex-col items-center gap-[3vh] ${cardClass}`}
       >
         <Icon
           className="size-[4.5vw] text-white/85"

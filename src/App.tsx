@@ -341,7 +341,7 @@ function AdhanModalContent() {
         Duaja e Ezanit
       </h3>
       <p
-        className="text-center text-[3.6vw] font-medium leading-[1.85] text-white max-w-[82vw]"
+        className="text-center text-[3.2vw] font-medium leading-[1.85] text-white max-w-[92vw]"
         dir="rtl"
         lang="ar"
         style={{
@@ -354,13 +354,13 @@ function AdhanModalContent() {
       </p>
       <div className="h-px w-[8vw] bg-white/25" />
       <p
-        className="text-center text-[2.1vw] font-medium leading-[1.55] text-white/95 max-w-[78vw]"
+        className="text-center text-[1.9vw] font-medium leading-[1.5] text-white/95 max-w-[88vw]"
         style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.6s ease forwards" }}
       >
         {ADHAN_DUA.albanian}
       </p>
       <p
-        className="text-center text-[1.35vw] italic leading-relaxed text-white/55 max-w-[72vw]"
+        className="text-center text-[1.25vw] italic leading-relaxed text-white/55 max-w-[82vw]"
         style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.75s ease forwards" }}
       >
         {ADHAN_DUA.english}
@@ -379,7 +379,7 @@ function IqamahModalContent() {
         Ajet Kur&apos;anor
       </h3>
       <p
-        className="text-center text-[4.2vw] font-medium leading-[1.7] text-white max-w-[82vw]"
+        className="text-center text-[4.2vw] font-medium leading-[1.7] text-white max-w-[92vw]"
         dir="rtl"
         lang="ar"
         style={{
@@ -392,7 +392,7 @@ function IqamahModalContent() {
       </p>
       <div className="h-px w-[8vw] bg-white/25" />
       <p
-        className="text-center text-[2.2vw] font-medium leading-[1.55] text-white/95 max-w-[78vw]"
+        className="text-center text-[2.2vw] font-medium leading-[1.55] text-white/95 max-w-[88vw]"
         style={{ opacity: 0, animation: "adhan-text-in 0.5s 0.6s ease forwards" }}
       >
         {IQAMAH_AYAH.albanian}
