@@ -34,6 +34,11 @@ const MODAL_DURATION_MINUTES = 4;
  */
 const REMINDER_WINDOW_MINUTES = 2;
 
+/** Don't show the reminder until this many minutes have passed since the
+ *  most recent prayer's time. Gives the congregation a quiet stretch
+ *  immediately after each prayer before the next-prayer countdown starts. */
+const REMINDER_DELAY_AFTER_PRAYER_MINUTES = 30;
+
 export default function App() {
   useAutoReload();
   const { hasInteracted } = useFullscreenKiosk();
@@ -128,6 +133,21 @@ export default function App() {
     return min;
   }, [prayers, currentMinutes]);
 
+  // Minutes since the most recent prayer's time today. Returns Infinity
+  // before today's first prayer (so the post-jacia → sabahu window stays
+  // open all night).
+  const minutesSincePrevPrayer = useMemo(() => {
+    if (!prayers) return Infinity;
+    let mostRecent = -Infinity;
+    for (const key of PRAYER_ORDER) {
+      const prayerMin = timeToMinutes(prayers[key]);
+      if (prayerMin <= currentMinutes && prayerMin > mostRecent) {
+        mostRecent = prayerMin;
+      }
+    }
+    return mostRecent === -Infinity ? Infinity : currentMinutes - mostRecent;
+  }, [prayers, currentMinutes]);
+
   // True while we're inside the adhan → iqamah gap for any prayer.
   const isBetweenAdhanAndIqamah = useMemo(() => {
     if (!prayers) return false;
@@ -149,6 +169,7 @@ export default function App() {
     if (!prayers || !nextPrayer) return null;
     if (activePrayerKey || iqamahActivePrayerKey) return null;
     if (isBetweenAdhanAndIqamah) return null;
+    if (minutesSincePrevPrayer < REMINDER_DELAY_AFTER_PRAYER_MINUTES) return null;
     if (currentMinutes % 10 >= REMINDER_WINDOW_MINUTES) return null;
     // Skip entirely if another modal will fire during this window.
     if (minutesToNextScheduledModal < REMINDER_WINDOW_MINUTES) return null;
@@ -159,6 +180,7 @@ export default function App() {
     activePrayerKey,
     iqamahActivePrayerKey,
     isBetweenAdhanAndIqamah,
+    minutesSincePrevPrayer,
     currentMinutes,
     minutesToNextScheduledModal,
   ]);
