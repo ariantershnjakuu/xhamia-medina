@@ -33,8 +33,22 @@ export function useFullscreenKiosk() {
     }, [checkFullscreen]);
 
     useEffect(() => {
+        let retryTimer: ReturnType<typeof setTimeout> | null = null;
+
         const handleFullscreenChange = () => {
-            setIsFullscreen(checkFullscreen());
+            const inFs = checkFullscreen();
+            setIsFullscreen(inFs);
+
+            // Kiosk persistence: once the user has activated kiosk mode, treat
+            // any fullscreen exit as accidental (browser quirk, refocus during
+            // refetch, redraw glitch on TV WebViews) and re-request. A short
+            // delay lets the browser settle before we ask again.
+            if (!inFs && hasInteracted) {
+                if (retryTimer) clearTimeout(retryTimer);
+                retryTimer = setTimeout(() => {
+                    void enterFullscreen();
+                }, 100);
+            }
         };
 
         // Listen to all vendor prefixes
@@ -47,12 +61,13 @@ export function useFullscreenKiosk() {
         handleFullscreenChange();
 
         return () => {
+            if (retryTimer) clearTimeout(retryTimer);
             document.removeEventListener('fullscreenchange', handleFullscreenChange);
             document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
             document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
             document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
         };
-    }, [checkFullscreen]);
+    }, [checkFullscreen, enterFullscreen, hasInteracted]);
 
     useEffect(() => {
         // Auto-enter fullscreen on any interaction if not in fullscreen
