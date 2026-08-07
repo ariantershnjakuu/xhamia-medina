@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useClock } from "./hooks/useClock";
 import { usePrayerTimes } from "./hooks/usePrayerTimes";
 import { useWeather } from "./hooks/useWeather";
-import { useAutoReload } from "./hooks/useAutoReload";
+import { useDailyRefresh } from "./hooks/useDailyRefresh";
 import { useThemeMode } from "./hooks/useThemeMode";
 import { useFullscreenKiosk } from "./hooks/useFullscreenKiosk";
 import {
@@ -40,12 +40,15 @@ const REMINDER_WINDOW_MINUTES = 2;
 const REMINDER_DELAY_AFTER_PRAYER_MINUTES = 30;
 
 export default function App() {
-  useAutoReload();
   const { hasInteracted } = useFullscreenKiosk();
 
   const clock = useClock();
-  const { data: prayerData, isStale } = usePrayerTimes();
+  const { data: prayerData, isStale, refetch } = usePrayerTimes();
   const { data: weather, loading: weatherLoading } = useWeather();
+
+  // At 00:05 pull the new day's times in place — no page reload, so the kiosk
+  // stays fullscreen through the nightly rollover.
+  useDailyRefresh(refetch);
 
   const prayers = prayerData?.prayers ?? null;
 

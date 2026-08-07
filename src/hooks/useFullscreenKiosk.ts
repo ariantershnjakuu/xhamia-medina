@@ -1,22 +1,50 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+
+/**
+ * Delays (ms) between re-entry attempts after an unexpected fullscreen exit.
+ * Escalating, and deliberately finite: most browsers reject requestFullscreen()
+ * without a user gesture, so after these we stop burning cycles and wait for
+ * the next touch/click/keypress instead.
+ */
+const REENTRY_BACKOFF_MS = [100, 500, 2_000, 5_000];
+
+/** Vendor-prefixed fullscreen surface, still needed by older TV WebViews. */
+type FullscreenDocument = Document & {
+    webkitFullscreenElement?: Element | null;
+    mozFullScreenElement?: Element | null;
+    msFullscreenElement?: Element | null;
+};
+
+type FullscreenElement = HTMLElement & {
+    webkitRequestFullscreen?: () => Promise<void> | void;
+    mozRequestFullScreen?: () => Promise<void> | void;
+    msRequestFullscreen?: () => Promise<void> | void;
+};
 
 export function useFullscreenKiosk() {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [hasInteracted, setHasInteracted] = useState(false);
 
+    // Mirror of `hasInteracted` read from listeners, so the effects below can
+    // register once on mount instead of tearing down on every state change.
+    const hasInteractedRef = useRef(false);
+    const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const retryIndexRef = useRef(0);
+
     const checkFullscreen = useCallback(() => {
+        const doc = document as FullscreenDocument;
         return !!(
-            document.fullscreenElement ||
-            (document as any).webkitFullscreenElement ||
-            (document as any).mozFullScreenElement ||
-            (document as any).msFullscreenElement
+            doc.fullscreenElement ||
+            doc.webkitFullscreenElement ||
+            doc.mozFullScreenElement ||
+            doc.msFullscreenElement
         );
     }, []);
 
     const enterFullscreen = useCallback(async () => {
         if (checkFullscreen()) return;
 
-        const el = document.documentElement as any;
+        const el = document.documentElement as FullscreenElement;
         try {
             if (el.requestFullscreen) {
                 await el.requestFullscreen();
@@ -33,22 +61,45 @@ export function useFullscreenKiosk() {
     }, [checkFullscreen]);
 
     useEffect(() => {
-        let retryTimer: ReturnType<typeof setTimeout> | null = null;
+        const cancelReentry = () => {
+            if (retryTimerRef.current) {
+                clearTimeout(retryTimerRef.current);
+                retryTimerRef.current = null;
+            }
+            retryIndexRef.current = 0;
+        };
+
+        const scheduleReentry = () => {
+            if (retryTimerRef.current) return; // one chain at a time
+            const attempt = retryIndexRef.current;
+            if (attempt >= REENTRY_BACKOFF_MS.length) return;
+
+            retryTimerRef.current = setTimeout(async () => {
+                retryTimerRef.current = null;
+                retryIndexRef.current = attempt + 1;
+                if (checkFullscreen() || !hasInteractedRef.current) return;
+
+                await enterFullscreen();
+                // On success 'fullscreenchange' fires and cancels the chain.
+                if (!checkFullscreen()) scheduleReentry();
+            }, REENTRY_BACKOFF_MS[attempt]);
+        };
 
         const handleFullscreenChange = () => {
             const inFs = checkFullscreen();
             setIsFullscreen(inFs);
 
-            // Kiosk persistence: once the user has activated kiosk mode, treat
-            // any fullscreen exit as accidental (browser quirk, refocus during
-            // refetch, redraw glitch on TV WebViews) and re-request. A short
-            // delay lets the browser settle before we ask again.
-            if (!inFs && hasInteracted) {
-                if (retryTimer) clearTimeout(retryTimer);
-                retryTimer = setTimeout(() => {
-                    void enterFullscreen();
-                }, 100);
+            if (inFs) {
+                cancelReentry();
+                return;
             }
+
+            // Kiosk persistence: once the user has activated kiosk mode, treat
+            // any fullscreen exit as accidental (browser quirk, redraw glitch on
+            // TV WebViews) and re-request. Note this cannot rescue a *page
+            // reload* — the Fullscreen API needs a real user gesture — which is
+            // why nothing in this app reloads itself; see useDailyRefresh.
+            if (hasInteractedRef.current) scheduleReentry();
         };
 
         // Listen to all vendor prefixes
@@ -61,20 +112,23 @@ export function useFullscreenKiosk() {
         handleFullscreenChange();
 
         return () => {
-            if (retryTimer) clearTimeout(retryTimer);
+            cancelReentry();
             document.removeEventListener('fullscreenchange', handleFullscreenChange);
             document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
             document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
             document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
         };
-    }, [checkFullscreen, enterFullscreen, hasInteracted]);
+    }, [checkFullscreen, enterFullscreen]);
 
     useEffect(() => {
         // Auto-enter fullscreen on any interaction if not in fullscreen
         const handleInteraction = () => {
-            if (!hasInteracted) setHasInteracted(true);
+            hasInteractedRef.current = true;
+            setHasInteracted(true);
+            // A real gesture — reset the budget so re-entry gets a fresh chain.
+            retryIndexRef.current = 0;
             if (!checkFullscreen()) {
-                enterFullscreen();
+                void enterFullscreen();
             }
         };
 
@@ -88,7 +142,7 @@ export function useFullscreenKiosk() {
             window.removeEventListener('touchstart', handleInteraction);
             window.removeEventListener('keydown', handleInteraction);
         };
-    }, [checkFullscreen, enterFullscreen, hasInteracted]);
+    }, [checkFullscreen, enterFullscreen]);
 
     return { isFullscreen, hasInteracted, enterFullscreen };
 }

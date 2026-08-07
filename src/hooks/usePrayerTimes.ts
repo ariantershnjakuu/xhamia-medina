@@ -21,7 +21,7 @@ function makeFallback(): PrayerData {
   };
 }
 
-export function usePrayerTimes(): State {
+export function usePrayerTimes(): State & { refetch: () => void } {
   const [state, setState] = useState<State>({
     data: null,
     loading: true,
@@ -88,5 +88,6 @@ export function usePrayerTimes(): State {
     };
   }, [fetchPrayers]);
 
-  return state;
+  // fetchPrayers is stable, so callers can pass refetch to other hooks safely.
+  return { ...state, refetch: fetchPrayers };
 }
