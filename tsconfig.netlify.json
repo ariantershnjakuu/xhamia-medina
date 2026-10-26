@@ -18,7 +18,6 @@
   },
   "include": [
     "netlify/functions/**/*.ts",
-    "server/src/lib/**/*.ts",
-    "server/src/scrapers/**/*.ts"
+    "server/src/lib/**/*.ts"
   ]
 }

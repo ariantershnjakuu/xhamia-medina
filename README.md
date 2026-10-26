@@ -9,12 +9,12 @@ Built with **Vite + React 19 + TypeScript + Tailwind CSS v4**.
 ## Features
 
 - **Live clock** — Europe/Belgrade timezone, second-precise
-- **Prayer times** — scraped from official BIK ([bislame.net/namazet/](https://bislame.net/namazet/))
+- **Prayer times** — official BIK timetable ([bislame.net/namazet/](https://bislame.net/namazet/)), bundled in the server with automatic summer/winter time
 - **Next prayer highlight** — glowing gold card, auto-detected
 - **Countdown banner** — HH:MM:SS until next prayer
 - **Past prayer dimming** — completed prayers fade out
 - **Live weather** — temperature, condition, wind via Open-Meteo (no API key)
-- **Graceful fallback** — mock prayer times if scraper fails
+- **Graceful fallback** — mock prayer times if the API is unreachable
 - **TV-first UI** — 1920×1080, no scrolling, VW-scaled fonts, no user interaction needed
 
 ---
@@ -25,7 +25,7 @@ Built with **Vite + React 19 + TypeScript + Tailwind CSS v4**.
 |---|---|
 | Frontend | Vite 8 + React 19 + TypeScript |
 | Styling | Tailwind CSS v4 (`@tailwindcss/vite`) |
-| Backend | Express 4 + Cheerio (scraper) |
+| Backend | Express 4 (bundled BIK timetable) |
 | Weather | [Open-Meteo](https://open-meteo.com/) (free, no key) |
 | Fonts | Noto Sans via Google Fonts |
 
@@ -37,8 +37,8 @@ Built with **Vite + React 19 + TypeScript + Tailwind CSS v4**.
 xhamia-medina/
 ├── server/               # Express API (port 3001)
 │   └── src/
-│       ├── scrapers/     # bislame.net HTML scraper
-│       └── routes/       # /api/prayers + in-memory cache
+│       ├── lib/          # BIK timetable + DST-aware lookup
+│       └── routes/       # /api/prayers
 └── src/                  # Vite React frontend
     ├── types/
     ├── hooks/            # useClock, usePrayerTimes, useWeather
@@ -91,7 +91,7 @@ Then run the server and serve `dist/` via nginx or any static file server.
 The frontend can stay on `/api/prayers` in production.
 
 - Netlify serves the Vite app from `dist/`
-- `netlify/functions/api.ts` handles `/api/prayers` and `/api/prayers/refresh`
+- `netlify/functions/api.ts` handles `/api/prayers`
 - `netlify.toml` points Netlify at the correct publish and functions directories
 
 This means Netlify no longer depends on the local Vite proxy used in development.
@@ -102,7 +102,7 @@ This means Netlify no longer depends on the local Vite proxy used in development
 
 ### `GET /api/prayers`
 
-Returns today's prayer times scraped from BIK:
+Returns today's prayer times from the bundled BIK timetable:
 
 ```json
 {
@@ -124,11 +124,10 @@ Returns today's prayer times scraped from BIK:
 }
 ```
 
-Cache refreshes once per day (keyed by Belgrade date). Returns stale cache on scrape failure.
-
-### `POST /api/prayers/refresh`
-
-Force-refresh the cache. Useful if BIK updates times mid-day.
+Times are looked up per Belgrade calendar day from `server/src/lib/bik-timetable.ts`,
+which stores them in standard time (UTC+1); one hour is added on summer-time days.
+Nothing is fetched from bislame.net at runtime, because its own table gets the
+DST switch wrong every spring and autumn.
 
 ### `GET /health`
 
@@ -141,7 +140,6 @@ Server health check.
 1. Set the browser to kiosk mode: `chromium-browser --kiosk http://localhost:5173`
 2. Disable screen saver and sleep
 3. Use a systemd service or PM2 to auto-start the server
-4. Add a cron job or use `POST /api/prayers/refresh` each midnight to ensure fresh times
 
 ---
 
